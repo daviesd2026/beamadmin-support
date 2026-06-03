@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import subprocess
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -27,12 +28,12 @@ if AUTH_FILE.exists():
         pass
 
 SERVERS = [
-    {"id": "offroad", "name": "Str1x3vo Offroad", "path": "/opt/beammp-offroad", "port": 30816, "map": "Reshjemheia", "maxPlayers": 16, "maxCars": 3, "tags": ["Offroad", "Freeroam"], "note": "Public stock offroad server"},
-    {"id": "offroad-plus", "name": "Str1x3vo Offroad+", "path": "/opt/beammp-offroad-plus", "port": 30817, "map": "Johnson Valley", "maxPlayers": 16, "maxCars": 3, "tags": ["Offroad", "Freeroam"], "note": "Offroad plus with resource pack"},
-    {"id": "vanilla", "name": "Str1x3vo Vanilla", "path": "/opt/beammp-vanilla", "port": 30814, "map": "Italy", "maxPlayers": 16, "maxCars": 2, "tags": ["Freeroam"], "note": "Public stock freeroam server"},
-    {"id": "vanilla-plus", "name": "Str1x3vo Vanilla+", "path": "/opt/beammp-vanilla-plus", "port": 30815, "map": "West Coast USA", "maxPlayers": 16, "maxCars": 2, "tags": ["Freeroam"], "note": "Freeroam plus with Str1x3vo resources"},
-    {"id": "highforce", "name": "Str1x3vo Highforce Custom BackRoadDriving UK", "path": "/opt/beammp-highforce", "port": 30818, "map": "High Force", "maxPlayers": 16, "maxCars": 6, "tags": ["Backroads", "UK", "Custom"], "note": "Custom UK back road driving server"},
-    {"id": "freeroam-old", "name": "Str1x3vo Public Freeroam", "path": "/opt/beammp-server", "port": 30814, "map": "West Coast USA", "maxPlayers": 16, "maxCars": 5, "tags": ["Freeroam"], "note": "Stopped; shares port 30814 with Vanilla"},
+    {"id": "offroad", "service": "beammp-offroad.service", "name": "Str1x3vo Offroad", "path": "/opt/beammp-offroad", "port": 30816, "map": "Reshjemheia", "maxPlayers": 16, "maxCars": 3, "tags": ["Offroad", "Freeroam"], "note": "Public stock offroad server"},
+    {"id": "offroad-plus", "service": "beammp-offroad-plus.service", "name": "Str1x3vo Offroad+", "path": "/opt/beammp-offroad-plus", "port": 30817, "map": "Johnson Valley", "maxPlayers": 16, "maxCars": 3, "tags": ["Offroad", "Freeroam"], "note": "Offroad plus with resource pack"},
+    {"id": "vanilla", "service": "beammp-vanilla.service", "name": "Str1x3vo Vanilla", "path": "/opt/beammp-vanilla", "port": 30814, "map": "Italy", "maxPlayers": 16, "maxCars": 2, "tags": ["Freeroam"], "note": "Public stock freeroam server"},
+    {"id": "vanilla-plus", "service": "beammp-vanilla-plus.service", "name": "Str1x3vo Vanilla+", "path": "/opt/beammp-vanilla-plus", "port": 30815, "map": "West Coast USA", "maxPlayers": 16, "maxCars": 2, "tags": ["Freeroam"], "note": "Freeroam plus with Str1x3vo resources"},
+    {"id": "highforce", "service": "beammp-highforce.service", "name": "Str1x3vo Highforce Custom BackRoadDriving UK", "path": "/opt/beammp-highforce", "port": 30818, "map": "High Force", "maxPlayers": 16, "maxCars": 6, "tags": ["Backroads", "UK", "Custom"], "note": "Custom UK back road driving server"},
+    {"id": "freeroam-old", "service": "beammp-server.service", "name": "Str1x3vo Public Freeroam", "path": "/opt/beammp-server", "port": 30814, "map": "West Coast USA", "maxPlayers": 16, "maxCars": 5, "tags": ["Freeroam"], "note": "Stopped; shares port 30814 with Vanilla"},
 ]
 
 SESSIONS = {}
@@ -164,6 +165,36 @@ def write_server_config(server, updates):
     return read_server_config(server)
 
 
+def set_server_map(server, map_name):
+    if map_name not in MAP_PATHS:
+        raise ValueError("unknown map")
+    config_path = Path(server["path"]) / "ServerConfig.toml"
+    text = config_path.read_text(encoding="utf-8")
+    rendered = '"' + MAP_PATHS[map_name].replace('"', '\\"') + '"'
+    pattern = r"^(\s*Map\s*=\s*).*$"
+    if re.search(pattern, text, re.M):
+        text = re.sub(pattern, rf"\g<1>{rendered}", text, flags=re.M)
+    else:
+        text += f"\nMap = {rendered}\n"
+    config_path.write_text(text, encoding="utf-8")
+    return read_server_config(server)
+
+
+def restart_server_service(server):
+    service = server.get("service")
+    if not service:
+        raise RuntimeError("server service is not configured")
+    result = subprocess.run(
+        ["sudo", "-n", "systemctl", "restart", service],
+        text=True,
+        capture_output=True,
+        timeout=45,
+    )
+    if result.returncode != 0:
+        raise RuntimeError((result.stderr or result.stdout or "restart failed").strip())
+    return service
+
+
 def tail_lines(path, limit=100):
     try:
         with open(path, "r", encoding="utf-8", errors="replace") as handle:
@@ -289,7 +320,14 @@ class Handler(BaseHTTPRequestHandler):
                 if map_name not in MAP_PATHS:
                     self.send_json(400, {"error": "unknown map"})
                     return
-                command = queue_command(server, {"action": "changemap", "map": map_name, "mapPath": MAP_PATHS[map_name]})
+                try:
+                    settings = set_server_map(server, map_name)
+                    service = restart_server_service(server)
+                    self.send_json(200, {"ok": True, "map": map_name, "settings": settings, "restarted": service})
+                    return
+                except Exception as exc:
+                    self.send_json(500, {"error": str(exc)})
+                    return
             else:
                 command = queue_command(server, {"action": "console", "command": safe_text(body.get("command"), "")})
             self.send_json(202, {"ok": True, "command": command})
