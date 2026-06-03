@@ -339,6 +339,22 @@ renderServerDashboard();
 // -------------------------------------------------
 let apiToken = sessionStorage.getItem('beamadminToken') || '';
 let refreshTimer = null;
+const DISCORD_LINK = 'https://discord.gg/2WEntWFeQs';
+
+const REASON_TEMPLATES = {
+  kick: [
+    'Ramming is not accepted on this server. Please rejoin and drive respectfully.',
+    'Ignoring staff instructions. Please rejoin when you are ready to follow the rules.',
+    'Blocking or disrupting other players. Please rejoin and keep it fair.',
+    'AFK or inactive in a way that affects the server. You can rejoin when ready.'
+  ],
+  ban: [
+    'Ramming is not accepted on this server. Appeal here: ' + DISCORD_LINK,
+    'Repeated griefing after warnings. Appeal here: ' + DISCORD_LINK,
+    'Harassment or abusive behavior toward other players. Appeal here: ' + DISCORD_LINK,
+    'Bypassing rules or staff action. Appeal here: ' + DISCORD_LINK
+  ]
+};
 
 async function apiRequest(path, options) {
   const opts = options || {};
@@ -386,6 +402,33 @@ function htmlEscape(value) {
     .replace(/'/g, '&#039;');
 }
 
+function chooseReason(action) {
+  const templates = REASON_TEMPLATES[action] || [];
+  const lines = templates.map(function (text, index) {
+    return (index + 1) + '. ' + text;
+  });
+  lines.push('C. Custom reason');
+
+  const choice = prompt(
+    (action === 'ban' ? 'Ban' : 'Kick') + ' reason template:\n\n' + lines.join('\n\n'),
+    '1'
+  );
+
+  if (choice === null) return null;
+
+  const normalized = choice.trim().toLowerCase();
+  if (normalized === 'c' || normalized === 'custom') {
+    return prompt(action === 'ban' ? 'Custom ban reason' : 'Custom kick reason', action === 'ban' ? 'Banned by admin. Appeal here: ' + DISCORD_LINK : 'Kicked by admin.');
+  }
+
+  const selected = Number(normalized);
+  if (Number.isInteger(selected) && selected >= 1 && selected <= templates.length) {
+    return templates[selected - 1];
+  }
+
+  return choice.trim();
+}
+
 async function loadLiveServers() {
   if (!apiToken) return;
   try {
@@ -425,7 +468,7 @@ function renderLiveDashboard(servers) {
     '</div>',
     '<div class="section">',
       '<div class="section-header"><span class="section-title">Live players</span><button class="act-btn" id="refresh-live"><i class="ti ti-refresh"></i> Refresh</button></div>',
-      '<div class="card"><table class="player-table"><thead><tr><th>Server</th><th>Player</th><th>IP</th><th>BeamMP ID</th><th>Actions</th></tr></thead><tbody id="live-player-rows"></tbody></table></div>',
+      '<div class="card"><table class="player-table"><thead><tr><th>Server</th><th>Player</th><th>Server ID</th><th>Account</th><th>IP</th><th>Actions</th></tr></thead><tbody id="live-player-rows"></tbody></table></div>',
     '</div>'
   ].join('');
 
@@ -459,14 +502,16 @@ function renderLiveDashboard(servers) {
 
   const rows = [];
   servers.forEach(function (server) {
-    const players = ((server.bridge || {}).players || []);
+    const rawPlayers = (server.bridge || {}).players;
+    const players = Array.isArray(rawPlayers) ? rawPlayers : Object.values(rawPlayers || {});
     players.forEach(function (player) {
       rows.push([
         '<tr>',
           '<td>' + htmlEscape(server.name) + '</td>',
           '<td><div class="player-name"><div class="avatar av-a">' + htmlEscape((player.name || '?').slice(0, 2).toUpperCase()) + '</div>' + htmlEscape(player.name) + '</div></td>',
+          '<td><code>' + htmlEscape(player.serverPlayerId || player.id || '') + '</code></td>',
+          '<td>' + htmlEscape(player.beammp || (player.isGuest ? 'Guest' : player.role || 'Unknown')) + '</td>',
           '<td>' + htmlEscape(player.ip || '') + '</td>',
-          '<td>' + htmlEscape(player.beammp || '') + '</td>',
           '<td><div class="row-actions">',
             '<button class="act-btn player-kick" data-server="' + htmlEscape(server.id) + '" data-id="' + htmlEscape(player.id) + '" data-name="' + htmlEscape(player.name) + '"><i class="ti ti-logout"></i> Kick</button>',
             '<button class="act-btn danger player-ban" data-server="' + htmlEscape(server.id) + '" data-id="' + htmlEscape(player.id) + '" data-name="' + htmlEscape(player.name) + '"><i class="ti ti-ban"></i> Ban</button>',
@@ -475,7 +520,7 @@ function renderLiveDashboard(servers) {
       ].join(''));
     });
   });
-  document.getElementById('live-player-rows').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5">No players reported by the bridge yet.</td></tr>';
+  document.getElementById('live-player-rows').innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6">No players reported by the bridge yet.</td></tr>';
 
   document.querySelectorAll('.copy-address, .copy-path').forEach(function (button) {
     button.addEventListener('click', function () { copyText(button.dataset.address, button); });
@@ -495,8 +540,8 @@ function renderLiveDashboard(servers) {
   document.querySelectorAll('.player-kick, .player-ban').forEach(function (button) {
     button.addEventListener('click', async function () {
       const action = button.classList.contains('player-ban') ? 'ban' : 'kick';
-      const reason = prompt(action === 'ban' ? 'Ban reason' : 'Kick reason', action === 'ban' ? 'Banned by admin' : 'Kicked by admin');
-      if (reason === null) return;
+      const reason = chooseReason(action);
+      if (reason === null || reason.trim() === '') return;
       button.disabled = true;
       try {
         await apiRequest('/api/servers/' + button.dataset.server + '/' + action, {

@@ -11,6 +11,8 @@ local bans = {
     ips = {},
 }
 
+local authProfiles = {}
+
 local function log(message)
     print("[" .. PLUGIN .. "] " .. tostring(message))
 end
@@ -75,6 +77,18 @@ local function getIdentifiers(playerId)
     return {}
 end
 
+local function getRole(playerId)
+    local ok, role = pcall(function() return MP.GetPlayerRole(playerId) end)
+    if ok then return tostring(role or "") end
+    return ""
+end
+
+local function getGuestFlag(playerId)
+    local ok, guest = pcall(function() return MP.IsPlayerGuest(playerId) end)
+    if ok then return guest and true or false end
+    return nil
+end
+
 local function getPlayers()
     local ok, players = pcall(function() return MP.GetPlayers() end)
     if ok and type(players) == "table" then return players end
@@ -108,11 +122,24 @@ local function writeStatus()
     local players = {}
     for playerId, playerName in pairs(getPlayers()) do
         local identifiers = getIdentifiers(playerId)
+        local profile = authProfiles[lower(playerName)] or {}
+        local fullIdentifiers = identifiers
+        if type(profile.identifiers) == "table" then
+            for key, value in pairs(profile.identifiers) do
+                if fullIdentifiers[key] == nil then
+                    fullIdentifiers[key] = value
+                end
+            end
+        end
         table.insert(players, {
             id = tostring(playerId),
+            serverPlayerId = tostring(playerId),
             name = tostring(playerName or ""),
-            ip = tostring(identifiers.ip or ""),
-            beammp = tostring(identifiers.beammp or ""),
+            ip = tostring(fullIdentifiers.ip or ""),
+            beammp = tostring(fullIdentifiers.beammp or fullIdentifiers.beammp_id or fullIdentifiers.beammpId or fullIdentifiers.id or ""),
+            role = profile.role or getRole(playerId),
+            isGuest = profile.isGuest,
+            identifiers = fullIdentifiers,
         })
     end
     writeJson(STATUS_FILE, {
@@ -200,6 +227,11 @@ end
 
 function onPlayerAuth(playerName, playerRole, isGuest, identifiers)
     loadBans()
+    authProfiles[lower(playerName)] = {
+        role = tostring(playerRole or ""),
+        isGuest = isGuest and true or false,
+        identifiers = type(identifiers) == "table" and identifiers or {},
+    }
     local nameKey = lower(playerName)
     local ip = ""
     if type(identifiers) == "table" then ip = tostring(identifiers.ip or "") end

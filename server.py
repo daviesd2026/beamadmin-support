@@ -60,6 +60,18 @@ def server_by_id(server_id):
     return None
 
 
+def normalize_status(status):
+    if not isinstance(status, dict):
+        return {}
+    players = status.get("players")
+    if isinstance(players, dict):
+        status["players"] = list(players.values())
+    elif not isinstance(players, list):
+        status["players"] = []
+    status["playerCount"] = len(status["players"])
+    return status
+
+
 def safe_text(value, fallback):
     text = str(value or "").replace("\r", " ").replace("\n", " ").strip()
     return text[:180] if text else fallback
@@ -174,7 +186,7 @@ class Handler(BaseHTTPRequestHandler):
                 status = read_json(bridge_dir(server) / "status.json", {})
                 item = dict(server)
                 item["address"] = f"{PUBLIC_IP}:{server['port']}"
-                item["bridge"] = status if isinstance(status, dict) else {}
+                item["bridge"] = normalize_status(status)
                 item["online"] = bool(item["bridge"].get("seenAt") and time.time() - int(item["bridge"].get("seenAt", 0)) < 20)
                 payload.append(item)
             self.send_json(200, {"publicIp": PUBLIC_IP, "servers": payload})
@@ -189,7 +201,7 @@ class Handler(BaseHTTPRequestHandler):
             status = read_json(bridge_dir(server) / "status.json", {})
             item = dict(server)
             item["address"] = f"{PUBLIC_IP}:{server['port']}"
-            item["bridge"] = status if isinstance(status, dict) else {}
+            item["bridge"] = normalize_status(status)
             item["online"] = bool(item["bridge"].get("seenAt") and time.time() - int(item["bridge"].get("seenAt", 0)) < 20)
             self.send_json(200, item)
             return
