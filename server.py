@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 import secrets
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,6 +17,14 @@ USERS = {
     "admin": hashlib.sha256(b"CHANGE_ME_ADMIN_PASSWORD").hexdigest(),
     "superadmin": hashlib.sha256(b"CHANGE_ME_SUPERADMIN_PASSWORD").hexdigest(),
 }
+AUTH_FILE = Path("/opt/beamadmin/auth.json")
+if AUTH_FILE.exists():
+    try:
+        loaded_users = json.loads(AUTH_FILE.read_text(encoding="utf-8"))
+        if isinstance(loaded_users, dict):
+            USERS.update({str(k): str(v) for k, v in loaded_users.items()})
+    except Exception:
+        pass
 
 SERVERS = [
     {"id": "offroad", "name": "Str1x3vo Offroad", "path": "/opt/beammp-offroad", "port": 30816, "map": "Reshjemheia", "maxPlayers": 16, "maxCars": 3, "tags": ["Offroad", "Freeroam"], "note": "Public stock offroad server"},
@@ -28,6 +37,18 @@ SERVERS = [
 
 SESSIONS = {}
 SESSION_TTL = 12 * 60 * 60
+MAPS = ["Italy", "West Coast USA", "Reshjemheia", "Johnson Valley", "High Force", "GridMap", "Small Island", "Industrial Site", "East Coast USA"]
+MAP_PATHS = {
+    "Italy": "/levels/italy/info.json",
+    "West Coast USA": "/levels/west_coast_usa/info.json",
+    "Reshjemheia": "/levels/Reshjemheia/info.json",
+    "Johnson Valley": "/levels/johnson_valley/info.json",
+    "High Force": "/levels/highforce/info.json",
+    "GridMap": "/levels/gridmap_v2/info.json",
+    "Small Island": "/levels/small_island/info.json",
+    "Industrial Site": "/levels/industrial/info.json",
+    "East Coast USA": "/levels/east_coast_usa/info.json",
+}
 
 
 def bridge_dir(server):
@@ -70,6 +91,101 @@ def normalize_status(status):
         status["players"] = []
     status["playerCount"] = len(status["players"])
     return status
+
+
+def queue_command(server, command):
+    queue_file = bridge_dir(server) / "queue.json"
+    queue = read_json(queue_file, [])
+    if not isinstance(queue, list):
+        queue = []
+    command["id"] = command.get("id") or secrets.token_hex(12)
+    command["createdAt"] = int(time.time())
+    queue.append(command)
+    write_json(queue_file, queue[-100:])
+    return command
+
+
+def read_server_config(server):
+    config_path = Path(server["path"]) / "ServerConfig.toml"
+    text = ""
+    try:
+        text = config_path.read_text(encoding="utf-8")
+    except Exception:
+        pass
+
+    def val(key, fallback=""):
+        match = re.search(rf"^\s*{re.escape(key)}\s*=\s*(.+?)\s*$", text, re.M)
+        if not match:
+            return fallback
+        raw = match.group(1).strip()
+        if raw.startswith('"') and raw.endswith('"'):
+            return raw[1:-1]
+        if raw.lower() in ("true", "false"):
+            return raw.lower() == "true"
+        try:
+            return int(raw)
+        except Exception:
+            return raw
+
+    map_path = val("Map", server.get("map", ""))
+    current_map = next((name for name, path in MAP_PATHS.items() if path == map_path), server.get("map", map_path))
+    return {
+        "name": val("Name", server["name"]),
+        "maxPlayers": val("MaxPlayers", server.get("maxPlayers", 16)),
+        "password": val("Password", ""),
+        "private": val("Private", False),
+        "map": current_map,
+        "mapPath": map_path,
+    }
+
+
+def write_server_config(server, updates):
+    config_path = Path(server["path"]) / "ServerConfig.toml"
+    text = config_path.read_text(encoding="utf-8")
+    replacements = {
+        "Name": str(updates.get("name", "")).strip(),
+        "MaxPlayers": str(int(updates.get("maxPlayers", 16))),
+        "Password": str(updates.get("password", "")),
+        "Private": "true" if bool(updates.get("private")) else "false",
+    }
+
+    for key, value in replacements.items():
+        if key == "MaxPlayers" or key == "Private":
+            rendered = value
+        else:
+            rendered = '"' + value.replace('"', '\\"') + '"'
+        pattern = rf"^(\s*{re.escape(key)}\s*=\s*).*$"
+        if re.search(pattern, text, re.M):
+            text = re.sub(pattern, rf"\g<1>{rendered}", text, flags=re.M)
+        else:
+            text += f"\n{key} = {rendered}\n"
+
+    config_path.write_text(text, encoding="utf-8")
+    return read_server_config(server)
+
+
+def tail_lines(path, limit=100):
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as handle:
+            lines = handle.readlines()
+        return [line.rstrip("\n") for line in lines[-limit:]]
+    except Exception:
+        return []
+
+
+def read_bridge_results(server, limit=100):
+    return tail_lines(bridge_dir(server) / "results.log", limit)
+
+
+def bans_for_server(server):
+    bridge = read_json(bridge_dir(server) / "status.json", {})
+    bridge_bans = normalize_status(bridge).get("bans", {})
+    rows = []
+    for name, reason in (bridge_bans.get("names") or {}).items():
+        rows.append({"playerName": name, "beammpId": "", "reason": reason, "bannedOn": "", "serverId": server["id"], "serverName": server["name"], "playerId": name})
+    for ip, reason in (bridge_bans.get("ips") or {}).items():
+        rows.append({"playerName": ip, "beammpId": "", "reason": reason, "bannedOn": "", "serverId": server["id"], "serverName": server["name"], "playerId": ip})
+    return rows
 
 
 def safe_text(value, fallback):
@@ -147,25 +263,62 @@ class Handler(BaseHTTPRequestHandler):
                 return
 
             action = parts[3]
-            command = {
-                "id": secrets.token_hex(12),
+            command = queue_command(server, {
                 "action": action,
                 "playerId": safe_text(body.get("playerId"), ""),
                 "playerName": safe_text(body.get("playerName"), ""),
                 "reason": safe_text(body.get("reason"), "Admin action from BeamAdmin"),
-                "createdAt": int(time.time()),
-            }
+            })
             if action in ("kick", "ban") and not command["playerId"] and not command["playerName"]:
                 self.send_json(400, {"error": "playerId or playerName required"})
                 return
 
-            queue_file = bridge_dir(server) / "queue.json"
-            queue = read_json(queue_file, [])
-            if not isinstance(queue, list):
-                queue = []
-            queue.append(command)
-            write_json(queue_file, queue[-50:])
             self.send_json(202, {"ok": True, "command": command})
+            return
+
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] in ("deletevehicle", "changemap", "console"):
+            server = server_by_id(parts[2])
+            if not server:
+                self.send_json(404, {"error": "server not found"})
+                return
+            action = parts[3]
+            if action == "deletevehicle":
+                command = queue_command(server, {"action": "deletevehicle", "playerId": safe_text(body.get("playerId"), ""), "vehicleId": safe_text(body.get("vehicleId"), "")})
+            elif action == "changemap":
+                map_name = safe_text(body.get("map"), "")
+                if map_name not in MAP_PATHS:
+                    self.send_json(400, {"error": "unknown map"})
+                    return
+                command = queue_command(server, {"action": "changemap", "map": map_name, "mapPath": MAP_PATHS[map_name]})
+            else:
+                command = queue_command(server, {"action": "console", "command": safe_text(body.get("command"), "")})
+            self.send_json(202, {"ok": True, "command": command})
+            return
+
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] == "settings":
+            server = server_by_id(parts[2])
+            if not server:
+                self.send_json(404, {"error": "server not found"})
+                return
+            try:
+                settings = write_server_config(server, body)
+                self.send_json(200, {"ok": True, "settings": settings})
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
+            return
+
+        if path == "/api/auth/changepassword":
+            old_password = str(body.get("oldPassword", ""))
+            new_password = str(body.get("newPassword", ""))
+            username = str(body.get("username", "admin"))
+            expected = USERS.get(username)
+            digest = hashlib.sha256(old_password.encode("utf-8")).hexdigest()
+            if not expected or not secrets.compare_digest(expected, digest):
+                self.send_json(403, {"error": "old password is incorrect"})
+                return
+            USERS[username] = hashlib.sha256(new_password.encode("utf-8")).hexdigest()
+            write_json(Path("/opt/beamadmin/auth.json"), USERS)
+            self.send_json(200, {"ok": True})
             return
 
         self.send_json(404, {"error": "not found"})
@@ -204,6 +357,51 @@ class Handler(BaseHTTPRequestHandler):
             item["bridge"] = normalize_status(status)
             item["online"] = bool(item["bridge"].get("seenAt") and time.time() - int(item["bridge"].get("seenAt", 0)) < 20)
             self.send_json(200, item)
+            return
+
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers":
+            server = server_by_id(parts[2])
+            if not server:
+                self.send_json(404, {"error": "server not found"})
+                return
+            route = parts[3]
+            status = normalize_status(read_json(bridge_dir(server) / "status.json", {}))
+            if route == "status":
+                item = dict(server)
+                item["address"] = f"{PUBLIC_IP}:{server['port']}"
+                item["bridge"] = status
+                item["settings"] = read_server_config(server)
+                item["online"] = bool(status.get("seenAt") and time.time() - int(status.get("seenAt", 0)) < 20)
+                self.send_json(200, item)
+                return
+            if route == "bans":
+                self.send_json(200, {"bans": bans_for_server(server)})
+                return
+            if route == "settings":
+                self.send_json(200, {"settings": read_server_config(server), "maps": MAPS})
+                return
+            if route == "consolelog":
+                self.send_json(200, {"lines": read_bridge_results(server, 100)})
+                return
+            if route == "log":
+                self.send_json(200, {"lines": tail_lines(Path(server["path"]) / "Server.log", 300)})
+                return
+
+        self.send_json(404, {"error": "not found"})
+
+    def do_DELETE(self):
+        path = urlparse(self.path).path
+        if not self.require_auth():
+            return
+        parts = path.strip("/").split("/")
+        if len(parts) == 5 and parts[0] == "api" and parts[1] == "servers" and parts[3] == "ban":
+            server = server_by_id(parts[2])
+            if not server:
+                self.send_json(404, {"error": "server not found"})
+                return
+            player_id = safe_text(parts[4], "")
+            command = queue_command(server, {"action": "unban", "playerName": player_id, "playerId": player_id})
+            self.send_json(202, {"ok": True, "command": command})
             return
 
         self.send_json(404, {"error": "not found"})

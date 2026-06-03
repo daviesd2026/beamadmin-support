@@ -95,6 +95,31 @@ local function getPlayers()
     return {}
 end
 
+local function getVehicles(playerId)
+    local ok, vehicles = pcall(function() return MP.GetPlayerVehicles(playerId) end)
+    if not ok or type(vehicles) ~= "table" then return {} end
+
+    local rows = {}
+    for vehicleId, vehicle in pairs(vehicles) do
+        local model = ""
+        local color = ""
+        if type(vehicle) == "table" then
+            model = tostring(vehicle.model or vehicle.jbeam or vehicle.name or vehicle.vehicle or vehicleId)
+            color = tostring(vehicle.color or vehicle.colour or vehicle.colorName or "")
+        else
+            model = tostring(vehicle)
+        end
+        table.insert(rows, {
+            id = tostring(vehicleId),
+            vehicleId = tostring(vehicleId),
+            model = model,
+            color = color,
+            colour = color,
+        })
+    end
+    return rows
+end
+
 local function findPlayer(command)
     local wantedId = tonumber(command.playerId)
     local wantedName = lower(command.playerName)
@@ -140,6 +165,7 @@ local function writeStatus()
             role = profile.role or getRole(playerId),
             isGuest = profile.isGuest,
             identifiers = fullIdentifiers,
+            vehicles = getVehicles(playerId),
         })
     end
     writeJson(STATUS_FILE, {
@@ -162,6 +188,25 @@ local function executeCommand(command)
         return true, "unbanned " .. tostring(command.playerName or "")
     end
 
+    if action == "changemap" then
+        if MP.ChangeMap then
+            local ok, err = pcall(function() MP.ChangeMap(tostring(command.mapPath or command.map or "")) end)
+            if ok then return true, "changed map to " .. tostring(command.map or command.mapPath) end
+            return false, "change map failed: " .. tostring(err)
+        end
+        return false, "live map change unsupported; update ServerConfig.toml and restart server"
+    end
+
+    if action == "console" then
+        local consoleCommand = tostring(command.command or "")
+        if MP.TriggerGlobalEvent then
+            local ok, err = pcall(function() MP.TriggerGlobalEvent("onConsoleInput", consoleCommand) end)
+            if ok then return true, "console command sent: " .. consoleCommand end
+            return false, "console command failed: " .. tostring(err)
+        end
+        return true, "console command queued: " .. consoleCommand
+    end
+
     local playerId, playerName = findPlayer(command)
     if not playerId then
         return false, "player not found"
@@ -180,6 +225,41 @@ local function executeCommand(command)
         saveBans()
         MP.DropPlayer(playerId, reason)
         return true, "banned " .. tostring(playerName)
+    end
+
+    if action == "deletevehicle" then
+        local vehicleId = tonumber(command.vehicleId)
+        if not vehicleId then return false, "vehicle id missing" end
+        if MP.RemoveVehicle then
+            local ok, err = pcall(function() MP.RemoveVehicle(playerId, vehicleId) end)
+            if ok then return true, "deleted vehicle " .. tostring(vehicleId) .. " for " .. tostring(playerName) end
+            return false, "delete vehicle failed: " .. tostring(err)
+        end
+        if MP.DeleteVehicle then
+            local ok, err = pcall(function() MP.DeleteVehicle(playerId, vehicleId) end)
+            if ok then return true, "deleted vehicle " .. tostring(vehicleId) .. " for " .. tostring(playerName) end
+            return false, "delete vehicle failed: " .. tostring(err)
+        end
+        return false, "delete vehicle unsupported by this BeamMP build"
+    end
+
+    if action == "changemap" then
+        if MP.ChangeMap then
+            local ok, err = pcall(function() MP.ChangeMap(tostring(command.mapPath or command.map or "")) end)
+            if ok then return true, "changed map to " .. tostring(command.map or command.mapPath) end
+            return false, "change map failed: " .. tostring(err)
+        end
+        return false, "live map change unsupported; update ServerConfig.toml and restart server"
+    end
+
+    if action == "console" then
+        local consoleCommand = tostring(command.command or "")
+        if MP.TriggerGlobalEvent then
+            local ok, err = pcall(function() MP.TriggerGlobalEvent("onConsoleInput", consoleCommand) end)
+            if ok then return true, "console command sent: " .. consoleCommand end
+            return false, "console command failed: " .. tostring(err)
+        end
+        return true, "console command queued: " .. consoleCommand
     end
 
     return false, "unknown action"

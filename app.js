@@ -90,6 +90,7 @@ pwToggle.addEventListener('click', function () {
 // -------------------------------------------------
 logoutBtn.addEventListener('click', function () {
   sessionStorage.removeItem('beamadminToken');
+  localStorage.removeItem('beam_token');
   dashboard.classList.add('hidden');
   loginScreen.classList.remove('hidden');
   errMsg.textContent = '';
@@ -337,8 +338,9 @@ renderServerDashboard();
 // -------------------------------------------------
 //  Live admin API
 // -------------------------------------------------
-let apiToken = sessionStorage.getItem('beamadminToken') || '';
+let apiToken = localStorage.getItem('beam_token') || sessionStorage.getItem('beamadminToken') || '';
 let refreshTimer = null;
+let pageTimer = null;
 const DISCORD_LINK = 'https://discord.gg/2WEntWFeQs';
 
 const REASON_TEMPLATES = {
@@ -384,6 +386,7 @@ async function apiLoginAndRender(username, password) {
     });
     apiToken = result.token;
     sessionStorage.setItem('beamadminToken', apiToken);
+    localStorage.setItem('beam_token', apiToken);
     await loadLiveServers();
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(loadLiveServers, 5000);
@@ -438,6 +441,7 @@ async function loadLiveServers() {
     if (err.status === 401) {
       apiToken = '';
       sessionStorage.removeItem('beamadminToken');
+      localStorage.removeItem('beam_token');
       if (refreshTimer) clearInterval(refreshTimer);
       dashboard.classList.add('hidden');
       loginScreen.classList.remove('hidden');
@@ -565,3 +569,296 @@ function renderLiveDashboard(servers) {
 }
 
 attemptsTxt.textContent = 'Use your admin login';
+
+// -------------------------------------------------
+//  Managed pages
+// -------------------------------------------------
+const AVAILABLE_MAPS = ['Italy', 'West Coast USA', 'Reshjemheia', 'Johnson Valley', 'High Force', 'GridMap', 'Small Island', 'Industrial Site', 'East Coast USA'];
+
+function setActiveNav(name) {
+  navItems.forEach(function (btn) {
+    btn.classList.toggle('active', btn.dataset.page === name);
+  });
+  pageTitle.textContent = pageLabels[name] || name;
+}
+
+function clearPageTimer() {
+  if (pageTimer) clearInterval(pageTimer);
+  pageTimer = null;
+}
+
+function showManagedPage(name) {
+  clearPageTimer();
+  setActiveNav(name);
+  if (name === 'dashboard' || name === 'players') {
+    pageDashboard.classList.remove('hidden');
+    pageOther.classList.add('hidden');
+    loadLiveServers();
+    return;
+  }
+  pageDashboard.classList.add('hidden');
+  pageOther.classList.remove('hidden');
+  const renderers = {
+    vehicles: renderVehiclesPage,
+    maps: renderMapsPage,
+    banlist: renderBanListPage,
+    settings: renderSettingsPage,
+    console: renderConsolePage,
+    logs: renderLogsPage
+  };
+  if (renderers[name]) {
+    renderers[name]();
+  } else {
+    pageOther.innerHTML = '<div class="placeholder-page"><p>Page unavailable</p></div>';
+  }
+}
+
+showPage = showManagedPage;
+
+function renderLoading(label) {
+  pageOther.innerHTML = '<div class="page-state"><div class="spinner"></div><p>' + htmlEscape(label || 'Loading') + '</p></div>';
+}
+
+function renderError(message, retry) {
+  pageOther.innerHTML = '<div class="error-banner"><strong>Request failed</strong><span>' + htmlEscape(message) + '</span><button class="act-btn danger" id="retry-page"><i class="ti ti-refresh"></i> Retry</button></div>';
+  document.getElementById('retry-page').addEventListener('click', retry);
+}
+
+async function getServers() {
+  const payload = await apiRequest('/api/servers');
+  return payload.servers || [];
+}
+
+async function getServerStatus(serverId) {
+  return apiRequest('/api/servers/' + serverId + '/status');
+}
+
+function serverOptions(servers, selectedId) {
+  return servers.map(function (server) {
+    return '<option value="' + htmlEscape(server.id) + '"' + (server.id === selectedId ? ' selected' : '') + '>' + htmlEscape(server.name) + '</option>';
+  }).join('');
+}
+
+function mapOptions(current) {
+  return AVAILABLE_MAPS.map(function (name) {
+    return '<option value="' + htmlEscape(name) + '"' + (name === current ? ' selected' : '') + '>' + htmlEscape(name) + '</option>';
+  }).join('');
+}
+
+async function renderVehiclesPage() {
+  renderLoading('Loading vehicles');
+  try {
+    const servers = await getServers();
+    const rows = [];
+    servers.forEach(function (server) {
+      const players = Array.isArray((server.bridge || {}).players) ? server.bridge.players : Object.values((server.bridge || {}).players || {});
+      players.forEach(function (player) {
+        const vehicles = Array.isArray(player.vehicles) ? player.vehicles : Object.values(player.vehicles || {});
+        vehicles.forEach(function (vehicle) {
+          rows.push({ server: server, player: player, vehicle: vehicle });
+        });
+      });
+    });
+    pageOther.innerHTML = [
+      '<div class="section"><div class="section-header"><span class="section-title">Spawned vehicles</span><button class="act-btn" id="refresh-vehicles"><i class="ti ti-refresh"></i> Refresh</button></div>',
+      '<div class="card"><table class="player-table"><thead><tr><th>Player</th><th>Vehicle model</th><th>Server</th><th>Colour</th><th>Actions</th></tr></thead><tbody>',
+      rows.length ? rows.map(function (row) {
+        return '<tr><td>' + htmlEscape(row.player.name) + '</td><td>' + htmlEscape(row.vehicle.model || row.vehicle.name || row.vehicle.id || 'Unknown') + '</td><td>' + htmlEscape(row.server.name) + '</td><td>' + htmlEscape(row.vehicle.colour || row.vehicle.color || '-') + '</td><td><button class="act-btn danger delete-vehicle" data-server="' + htmlEscape(row.server.id) + '" data-player="' + htmlEscape(row.player.id) + '" data-vehicle="' + htmlEscape(row.vehicle.vehicleId || row.vehicle.id || '') + '"><i class="ti ti-trash"></i> Delete vehicle</button></td></tr>';
+      }).join('') : '<tr><td colspan="5">No spawned vehicles reported by the bridge.</td></tr>',
+      '</tbody></table></div></div>'
+    ].join('');
+    document.getElementById('refresh-vehicles').addEventListener('click', renderVehiclesPage);
+    document.querySelectorAll('.delete-vehicle').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        btn.disabled = true;
+        try {
+          await apiRequest('/api/servers/' + btn.dataset.server + '/deletevehicle', { method: 'POST', body: JSON.stringify({ playerId: btn.dataset.player, vehicleId: btn.dataset.vehicle }) });
+          btn.innerHTML = '<i class="ti ti-check"></i> Queued';
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          setTimeout(renderVehiclesPage, 1500);
+        }
+      });
+    });
+  } catch (err) {
+    renderError(err.message, renderVehiclesPage);
+  }
+}
+
+async function renderMapsPage() {
+  renderLoading('Loading maps');
+  try {
+    const servers = await getServers();
+    pageOther.innerHTML = '<div class="server-grid">' + servers.map(function (server) {
+      const currentMap = (server.bridge || {}).map || server.map || 'Unknown';
+      return [
+        '<article class="server-card">',
+        '<div class="server-card-head"><div><h3>' + htmlEscape(server.name) + '</h3><p>' + Number((server.bridge || {}).playerCount || 0) + ' players online</p></div><span class="badge ' + (server.online ? 'badge-green' : 'badge-red') + '">' + (server.online ? 'online' : 'offline') + '</span></div>',
+        '<div class="field compact-field"><label>Current map</label><select class="map-select" data-server="' + htmlEscape(server.id) + '">' + mapOptions(currentMap) + '</select></div>',
+        '<button class="act-btn save-map" data-server="' + htmlEscape(server.id) + '"><i class="ti ti-map-2"></i> Change map</button>',
+        '</article>'
+      ].join('');
+    }).join('') + '</div>';
+    document.querySelectorAll('.save-map').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        const select = document.querySelector('.map-select[data-server="' + btn.dataset.server + '"]');
+        btn.disabled = true;
+        try {
+          await apiRequest('/api/servers/' + btn.dataset.server + '/changemap', { method: 'POST', body: JSON.stringify({ map: select.value }) });
+          btn.innerHTML = '<i class="ti ti-check"></i> Queued';
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          setTimeout(function () { btn.disabled = false; btn.innerHTML = '<i class="ti ti-map-2"></i> Change map'; }, 1200);
+        }
+      });
+    });
+  } catch (err) {
+    renderError(err.message, renderMapsPage);
+  }
+}
+
+async function renderBanListPage() {
+  renderLoading('Loading ban list');
+  try {
+    const servers = await getServers();
+    const banPayloads = await Promise.all(servers.map(function (server) {
+      return apiRequest('/api/servers/' + server.id + '/bans').catch(function () { return { bans: [] }; });
+    }));
+    const bans = banPayloads.flatMap(function (payload) { return payload.bans || []; });
+    pageOther.innerHTML = [
+      '<div class="section"><div class="section-header"><span class="section-title">Banned players</span><button class="act-btn" id="refresh-bans"><i class="ti ti-refresh"></i> Refresh</button></div>',
+      '<div class="card"><table class="player-table"><thead><tr><th>Player name</th><th>BeamMP ID</th><th>Reason</th><th>Banned on</th><th>Server</th><th>Actions</th></tr></thead><tbody>',
+      bans.length ? bans.map(function (ban) {
+        return '<tr><td>' + htmlEscape(ban.playerName) + '</td><td>' + htmlEscape(ban.beammpId || '-') + '</td><td>' + htmlEscape(ban.reason || '-') + '</td><td>' + htmlEscape(ban.bannedOn || '-') + '</td><td>' + htmlEscape(ban.serverName) + '</td><td><button class="act-btn unban-player" data-server="' + htmlEscape(ban.serverId) + '" data-player="' + htmlEscape(ban.playerId || ban.playerName) + '"><i class="ti ti-shield-check"></i> Unban</button></td></tr>';
+      }).join('') : '<tr><td colspan="6">No players are currently banned</td></tr>',
+      '</tbody></table></div></div>'
+    ].join('');
+    document.getElementById('refresh-bans').addEventListener('click', renderBanListPage);
+    document.querySelectorAll('.unban-player').forEach(function (btn) {
+      btn.addEventListener('click', async function () {
+        await apiRequest('/api/servers/' + btn.dataset.server + '/ban/' + encodeURIComponent(btn.dataset.player), { method: 'DELETE' });
+        renderBanListPage();
+      });
+    });
+  } catch (err) {
+    renderError(err.message, renderBanListPage);
+  }
+}
+
+async function renderSettingsPage() {
+  renderLoading('Loading settings');
+  try {
+    const servers = await getServers();
+    const settings = await Promise.all(servers.map(function (server) {
+      return apiRequest('/api/servers/' + server.id + '/settings').then(function (payload) {
+        return { server: server, settings: payload.settings || {} };
+      });
+    }));
+    pageOther.innerHTML = [
+      '<div class="settings-grid">',
+      settings.map(function (item) {
+        const s = item.settings;
+        return '<form class="server-card settings-form" data-server="' + htmlEscape(item.server.id) + '"><h3>' + htmlEscape(item.server.name) + '</h3><div class="field"><label>Server name</label><input name="name" value="' + htmlEscape(s.name || item.server.name) + '"></div><div class="field"><label>Max players</label><input name="maxPlayers" type="number" min="1" max="128" value="' + htmlEscape(s.maxPlayers || item.server.maxPlayers || 16) + '"></div><div class="field"><label>Password</label><input name="password" value="' + htmlEscape(s.password || '') + '"></div><label class="toggle-row"><input name="private" type="checkbox"' + (s.private ? ' checked' : '') + '> Private server</label><button class="act-btn" type="submit"><i class="ti ti-device-floppy"></i> Save</button></form>';
+      }).join(''),
+      '</div>',
+      '<form class="card admin-settings" id="password-form"><div class="section-header"><span class="section-title">Admin panel password</span></div><div class="form-grid"><div class="field"><label>Old password</label><input type="password" name="oldPassword"></div><div class="field"><label>New password</label><input type="password" name="newPassword"></div><div class="field"><label>Confirm</label><input type="password" name="confirmPassword"></div></div><button class="act-btn" type="submit"><i class="ti ti-key"></i> Change password</button></form>'
+    ].join('');
+    document.querySelectorAll('.settings-form').forEach(function (form) {
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const data = new FormData(form);
+        await apiRequest('/api/servers/' + form.dataset.server + '/settings', { method: 'POST', body: JSON.stringify({ name: data.get('name'), maxPlayers: data.get('maxPlayers'), password: data.get('password'), private: data.get('private') === 'on' }) });
+        alert('Settings saved. Restart the BeamMP server for config-only changes to take effect.');
+      });
+    });
+    document.getElementById('password-form').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      if (data.get('newPassword') !== data.get('confirmPassword')) {
+        alert('New passwords do not match.');
+        return;
+      }
+      await apiRequest('/api/auth/changepassword', { method: 'POST', body: JSON.stringify({ username: loggedInUser.textContent || 'admin', oldPassword: data.get('oldPassword'), newPassword: data.get('newPassword') }) });
+      alert('Password changed.');
+      event.currentTarget.reset();
+    });
+  } catch (err) {
+    renderError(err.message, renderSettingsPage);
+  }
+}
+
+async function renderConsolePage() {
+  renderLoading('Loading console');
+  try {
+    const servers = await getServers();
+    const selected = servers[0] ? servers[0].id : '';
+    pageOther.innerHTML = '<div class="section console-shell"><div class="section-header"><span class="section-title">Server console</span><div class="toolbar"><select id="console-server">' + serverOptions(servers, selected) + '</select><button class="act-btn" id="refresh-console"><i class="ti ti-refresh"></i> Refresh</button></div></div><div class="console-output" id="console-output"></div><div class="console-input"><input id="console-command" placeholder="Type command"><button class="act-btn" id="send-console"><i class="ti ti-send"></i> Send</button></div></div>';
+    async function loadConsole() {
+      const id = document.getElementById('console-server').value;
+      const payload = await apiRequest('/api/servers/' + id + '/consolelog');
+      const out = document.getElementById('console-output');
+      out.innerHTML = (payload.lines || []).map(function (line) { return '<div>' + htmlEscape(line) + '</div>'; }).join('');
+      out.scrollTop = out.scrollHeight;
+    }
+    document.getElementById('console-server').addEventListener('change', loadConsole);
+    document.getElementById('refresh-console').addEventListener('click', loadConsole);
+    document.getElementById('send-console').addEventListener('click', async function () {
+      const id = document.getElementById('console-server').value;
+      const input = document.getElementById('console-command');
+      if (!input.value.trim()) return;
+      await apiRequest('/api/servers/' + id + '/console', { method: 'POST', body: JSON.stringify({ command: input.value.trim() }) });
+      input.value = '';
+      setTimeout(loadConsole, 1500);
+    });
+    await loadConsole();
+  } catch (err) {
+    renderError(err.message, renderConsolePage);
+  }
+}
+
+async function renderLogsPage() {
+  renderLoading('Loading logs');
+  try {
+    const servers = await getServers();
+    const tabs = [{ id: 'all', name: 'All servers' }].concat(servers);
+    pageOther.innerHTML = '<div class="section"><div class="section-header"><div class="tabs" id="log-tabs">' + tabs.map(function (tab, index) { return '<button class="tab-btn' + (index === 0 ? ' active' : '') + '" data-server="' + htmlEscape(tab.id) + '">' + htmlEscape(tab.name) + '</button>'; }).join('') + '</div><button class="act-btn" id="download-log"><i class="ti ti-download"></i> Download log</button></div><div class="log-feed" id="log-feed"></div></div>';
+    let current = 'all';
+    async function loadLogs() {
+      const selectedServers = current === 'all' ? servers : servers.filter(function (server) { return server.id === current; });
+      const payloads = await Promise.all(selectedServers.map(function (server) {
+        return apiRequest('/api/servers/' + server.id + '/log').then(function (payload) { return { server: server, lines: payload.lines || [] }; }).catch(function () { return { server: server, lines: [] }; });
+      }));
+      const lines = payloads.flatMap(function (payload) {
+        return payload.lines.map(function (line) { return { server: payload.server.name, line: line }; });
+      }).slice(-500);
+      document.getElementById('log-feed').innerHTML = lines.map(function (entry) {
+        const text = entry.line.toLowerCase();
+        const cls = text.includes('joined') || text.includes('connected') ? 'log-green' : text.includes('left') || text.includes('kicked') || text.includes('banned') || text.includes('terminated') ? 'log-red' : text.includes('warn') || text.includes('ping') ? 'log-yellow' : 'log-white';
+        return '<div class="log-feed-line ' + cls + '"><span>' + htmlEscape(entry.server) + '</span>' + htmlEscape(entry.line) + '</div>';
+      }).join('');
+    }
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        current = btn.dataset.server;
+        loadLogs();
+      });
+    });
+    document.getElementById('download-log').addEventListener('click', function () {
+      const text = Array.from(document.querySelectorAll('.log-feed-line')).map(function (line) { return line.textContent; }).join('\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'beamadmin-' + current + '-log.txt';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+    await loadLogs();
+    pageTimer = setInterval(loadLogs, 5000);
+  } catch (err) {
+    renderError(err.message, renderLogsPage);
+  }
+}
