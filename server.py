@@ -183,19 +183,62 @@ def set_server_map(server, map_name):
     return read_server_config(server)
 
 
+def run_command(args, timeout=15):
+    return subprocess.run(
+        args,
+        text=True,
+        capture_output=True,
+        timeout=timeout,
+    )
+
+
+def systemctl_value(service, prop):
+    try:
+        result = run_command(["systemctl", "show", service, "--property", prop, "--value"])
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return ""
+
+
+def systemctl_active(service):
+    try:
+        result = run_command(["systemctl", "is-active", service])
+        return result.stdout.strip()
+    except Exception:
+        return "unknown"
+
+
+def systemctl_restart_args(service):
+    if hasattr(os, "geteuid") and os.geteuid() == 0:
+        return ["systemctl", "restart", service]
+    return ["sudo", "-n", "systemctl", "restart", service]
+
+
 def restart_server_service(server):
     service = server.get("service")
     if not service:
         raise RuntimeError("server service is not configured")
-    result = subprocess.run(
-        ["sudo", "-n", "systemctl", "restart", service],
-        text=True,
-        capture_output=True,
-        timeout=45,
-    )
+    before = systemctl_value(service, "ExecMainStartTimestampMonotonic")
+    result = run_command(systemctl_restart_args(service), timeout=45)
     if result.returncode != 0:
-        raise RuntimeError((result.stderr or result.stdout or "restart failed").strip())
-    return service
+        detail = (result.stderr or result.stdout or "restart failed").strip()
+        if "password" in detail.lower() or "sudo" in detail.lower():
+            detail += " Passwordless sudo is required for the beamadmin service user to restart BeamMP services."
+        raise RuntimeError(detail)
+
+    deadline = time.time() + 20
+    last_active = "unknown"
+    last_marker = ""
+    while time.time() < deadline:
+        last_active = systemctl_active(service)
+        last_marker = systemctl_value(service, "ExecMainStartTimestampMonotonic")
+        if last_active == "active" and (not before or not last_marker or last_marker != before):
+            return {"service": service, "status": last_active, "startedAt": last_marker}
+        time.sleep(1)
+
+    raise RuntimeError(f"restart command completed but {service} did not report a new active process; status={last_active}")
 
 
 def tail_lines(path, limit=100):
@@ -384,8 +427,8 @@ class Handler(BaseHTTPRequestHandler):
                 command = queue_command(server, {"action": "deletevehicle", "playerId": safe_text(body.get("playerId"), ""), "vehicleId": safe_text(body.get("vehicleId"), "")})
             elif action == "restart":
                 try:
-                    service = restart_server_service(server)
-                    self.send_json(200, {"ok": True, "restarted": service})
+                    restart = restart_server_service(server)
+                    self.send_json(200, {"ok": True, "restart": restart})
                     return
                 except Exception as exc:
                     self.send_json(500, {"error": str(exc)})
@@ -397,8 +440,8 @@ class Handler(BaseHTTPRequestHandler):
                     return
                 try:
                     settings = set_server_map(server, map_name)
-                    service = restart_server_service(server)
-                    self.send_json(200, {"ok": True, "map": map_name, "settings": settings, "restarted": service})
+                    restart = restart_server_service(server)
+                    self.send_json(200, {"ok": True, "map": map_name, "settings": settings, "restart": restart})
                     return
                 except Exception as exc:
                     self.send_json(500, {"error": str(exc)})
