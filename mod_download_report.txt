@@ -1,0 +1,58 @@
+BeamNG Vanilla+ mod download report
+Generated: 2026-06-04 01:53:44 GMT Daylight Time
+Destination: C:\Users\Str1x3v0\Downloads\beamng_vanilla_plus_mods
+
+EXISTS 1. Band1t Highway -> LOCAL_DOWNLOAD_FOLDER\\band1t_highway1.zip (199267438 bytes)
+EXISTS 2. 100KM Straight -> LOCAL_DOWNLOAD_FOLDER\\levels.zip (5997228 bytes)
+EXISTS 3. REKT Barren Dunes Wasteland Highway -> LOCAL_DOWNLOAD_FOLDER\\rekt_barren_dunes_wasteland_highway.zip (374293438 bytes)
+EXISTS 4. 2018 Porsche 919 Hybrid EVO -> LOCAL_DOWNLOAD_FOLDER\\porsche_919_hybrid_evo.zip (56868654 bytes)
+EXISTS 5. Vintage Custom Parts & Livery Pack -> LOCAL_DOWNLOAD_FOLDER\\vintage_parts_pack.zip (393755526 bytes)
+EXISTS 6. Truck Wheel Mod -> LOCAL_DOWNLOAD_FOLDER\\ra66_truckwheelmod.zip (52451366 bytes)
+EXISTS 7. Resized Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\wheelexpansion807.zip (2924101 bytes)
+EXISTS 8. whatawhat's Livery Pack -> LOCAL_DOWNLOAD_FOLDER\\whata_liverypack.zip (38189906 bytes)
+EXISTS 9. The Crew Emergency Livery Pack -> LOCAL_DOWNLOAD_FOLDER\\thecrewemergencyliveryandlightbarspack.zip (18806953 bytes)
+EXISTS 10. American Road -> LOCAL_DOWNLOAD_FOLDER\\americanroad.zip (695610988 bytes)
+EXISTS 11. River Highway -> LOCAL_DOWNLOAD_FOLDER\\river_highway.zip (402816469 bytes)
+EXISTS 12. NitroMethane Dragster -> LOCAL_DOWNLOAD_FOLDER\\mr_pigeon_hill_side_co_top_fuel.zip (76137883 bytes)
+EXISTS 13. 69k RPM Rev Limiter -> LOCAL_DOWNLOAD_FOLDER\\69k_RevLimit.zip (8022 bytes)
+EXISTS 14. Series Turbo Diesel Engine Pack -> LOCAL_DOWNLOAD_FOLDER\\vanturbodiesel31.zip (5508704 bytes)
+EXISTS 15. RB26DETT 2.6L I6 Nissan Engine And Transmission -> LOCAL_DOWNLOAD_FOLDER\\Hellraiser_RB26DETT.zip (11356886 bytes)
+EXISTS 16. American Racing SUV Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\arwheelpack.zip (39859408 bytes)
+EXISTS 17. ETK T20 Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\widewabol.zip (81144598 bytes)
+EXISTS 18. NFS BMW M3-GTR -> LOCAL_DOWNLOAD_FOLDER\\bmw_nfsmw_m3_gtr_.zip (115395334 bytes)
+EXISTS 19. Drift Shack -> LOCAL_DOWNLOAD_FOLDER\\DriftShack.zip (275150685 bytes)
+EXISTS 20. Driftoooo -> LOCAL_DOWNLOAD_FOLDER\\Driftoooo.zip (372845005 bytes)
+EXISTS 21. Machine's Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\machines_wheelpack.zip (122506372 bytes)
+EXISTS 22. D-Troxx Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\D-Troxx_Wheel_Pack.zip (263236557 bytes)
+EXISTS 23. Weird Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\conklin_wheel_pack_2.zip (7806566 bytes)
+EXISTS 24. 1320 Donk Wheel Pack -> LOCAL_DOWNLOAD_FOLDER\\1320DonkWheelsV1.zip (52751369 bytes)
+EXISTS 25. Underglow Everything -> LOCAL_DOWNLOAD_FOLDER\\soldmysoul_underglow.zip (1479074 bytes)
+EXISTS 26. Underglow Extra Colors -> LOCAL_DOWNLOAD_FOLDER\\underglow_extra_colors.zip (4316239 bytes)
+EXISTS 27. D-Series Underglow -> LOCAL_DOWNLOAD_FOLDER\\d-series_underglow.zip (4813841 bytes)
+EXISTS 28. New Racing Seats & Off-Road Seats -> LOCAL_DOWNLOAD_FOLDER\\seats.zip (8055066 bytes)
+EXISTS 29. Bacon's Drift 200BX -> LOCAL_DOWNLOAD_FOLDER\\bcm_200bx_drift.zip (6894519 bytes)
+EXISTS 30. Toyota Truck Engines -> LOCAL_DOWNLOAD_FOLDER\\toyotatruckengines_starb.zip (6157933 bytes)
+EXISTS 31. Hurtz Rent-A-Car Skin Pack -> LOCAL_DOWNLOAD_FOLDER\\hurtzrentals.zip (8415546 bytes)
+EXISTS 32. U-Haul Livery Pack -> LOCAL_DOWNLOAD_FOLDER\\TheAussiePanda_Uhaul.zip (13504203 bytes)
+EXISTS 33. Fiction Police Livery Pack -> LOCAL_DOWNLOAD_FOLDER\\fiction_pack.zip (85035773 bytes)
+EXISTS 34. Drag Car 7.5 Seconds Drag -> LOCAL_DOWNLOAD_FOLDER\\projects_model_4_trim_4.zip (62431448 bytes)
+EXISTS 35. Drag Batmobile -> LOCAL_DOWNLOAD_FOLDER\\skibidi_gyat_rizzler_model_65_trim_63.zip (44838901 bytes)
+EXISTS 36. Porsche 917 LH -> LOCAL_DOWNLOAD_FOLDER\\salteenuts_porsche_917_lh.zip (55788985 bytes)
+EXISTS 37. Ax BMW E30 -> LOCAL_DOWNLOAD_FOLDER\\gr_ax_bmw_e30.zip (75173559 bytes)
+EXISTS 38. the van & the furious toyota supre -> LOCAL_DOWNLOAD_FOLDER\\frust_wuv_van_stutututu.zip (82890342 bytes)
+SKIP 39. City of Los Injurus - marked skip/caution or missing URL
+SKIP 40. Drag Strip - marked skip/caution or missing URL
+SKIP 41. West Coast USA Extended Drag Strip - marked skip/caution or missing URL
+SKIP 42. Better Drag Transmissions - marked skip/caution or missing URL
+SKIP 43. Drift Pack - marked skip/caution or missing URL
+SKIP 44. Roundabout Drift Map - marked skip/caution or missing URL
+SKIP 45. Endless Highway - marked skip/caution or missing URL
+SKIP 46. So-Cal Interstate Highway - marked skip/caution or missing URL
+EXISTS 47. Meo's Drag Parts Pack -> LOCAL_DOWNLOAD_FOLDER\\dragpartswheelsnitrous.zip (63871529 bytes)
+DOWNLOADED 48. CK Tire Pack -> LOCAL_DOWNLOAD_FOLDER\\ck_tires_repo.zip (177340921 bytes)
+EXISTS 49. The Curiosity Dragavan -> LOCAL_DOWNLOAD_FOLDER\\ybm_curiosity_dragavan.zip (33866897 bytes)
+EXISTS 50. OMURO BY ONEH1T -> LOCAL_DOWNLOAD_FOLDER\\omuro_by_oneh1t.zip (372720154 bytes)
+SKIP 51. The DRAG TRUCK - marked skip/caution or missing URL
+SKIP 52. Burnside Experimental Drag - marked skip/caution or missing URL
+
+Summary: ok=42, failed=0, skipped=10
