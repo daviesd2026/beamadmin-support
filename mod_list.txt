@@ -1,0 +1,616 @@
+BeamNG / BeamMP Vanilla+ mod research list
+Generated: 2026-06-04
+Scope: Research only. No files downloaded.
+Target server: Str1x3vo Vanilla+
+Target install folder after manual download: /opt/beammp-vanilla-plus/Resources/Client/
+
+Important notes:
+- Only resource pages from beamng.com/resources are listed here.
+- This is a curated first pass, not an install order.
+- "Install priority" is based on freshness, rating/downloads, file size, and Vanilla+ fit.
+- Items marked CAUTION/SKIP are useful references but should not be installed unless you accept the risk.
+- Keep total installed zip size under 3GB.
+
+============================================================
+HIGH PRIORITY INSTALL CANDIDATES
+============================================================
+
+1. Band1t Highway
+Category: Street Racing / Maps - Urban / Maps - Misc
+URL: https://www.beamng.com/resources/band1t-highway.35612/
+File size: 190 MB
+Star rating: 4.5/5, 10 ratings
+Last updated: Oct 22, 2025
+Why it fits Vanilla+: Lightweight highway map designed for cutting up and traffic runs. Good street racing / highway cruising content.
+
+2. 100KM Straight
+Category: Drag Racing / Street Racing / Maps - Misc
+URL: https://www.beamng.com/resources/100km-straight.35181/
+File size: 5.7 MB
+Star rating: 5/5, 2 ratings
+Last updated: Jul 15, 2025
+Why it fits Vanilla+: Tiny file size, long straight Japanese expressway-style road, good for top-speed, roll racing, and drag testing.
+
+3. REKT Barren Dunes Wasteland Highway
+Category: Street Racing / Maps - Countryside / Maps - Misc
+URL: https://www.beamng.com/resources/rekt-barren-dunes-wasteland-highway.35148/
+File size: 357 MB
+Star rating: 4.75/5, 4 ratings
+Last updated: Jul 9, 2025
+Why it fits Vanilla+: Huge desert/highway environment with a 9-mile highway. Good for highway pulls, off-road builds, and cruising.
+
+4. 2018 Porsche 919 Hybrid EVO
+Category: Circuit Racing / Extra Cars - Supercars
+URL: https://www.beamng.com/resources/2018-porsche-919-hybrid-evo.30397/
+File size: 54.2 MB
+Star rating: 4.65217/5, 23 ratings
+Last updated: May 21, 2026
+Why it fits Vanilla+: Recently updated high-performance race car with aero/downforce and track use. Strong circuit/time attack addition.
+
+5. Vintage Custom Parts & Livery Pack
+Category: Body Kits & Visuals / Liveries & Wraps / Interior Mods / Extra Cars - Misc
+URL: https://www.beamng.com/resources/vintage-custom-parts-livery-pack.35304/
+File size: Not shown in search result; page notes earlier versions were over 500 MB and wheels are now split out
+Star rating: 4.84615/5, 91 ratings
+Last updated: May 5, 2026
+Why it fits Vanilla+: Big pack of custom parts and liveries for vintage vehicles, including hoods, spoilers, exhausts, and style parts. Great for car-meet Vanilla+.
+
+6. Truck Wheel Mod
+Category: Wheels & Tyres / Extra Cars - Misc
+URL: https://www.beamng.com/resources/truck-wheel-mod.38079/
+File size: Not shown in search result
+Star rating: 5/5, 11 ratings
+Last updated: May 27, 2026
+Why it fits Vanilla+: Fresh wheel pack for truck builds. Useful for lifted pickups, utility builds, and meet variety.
+
+7. Resized Wheel Pack
+Category: Wheels & Tyres / Stance & Fitment
+URL: https://beamng.com/resources/resized-wheel-pack.34618/
+File size: 2.8 MB
+Star rating: 5/5, 3 ratings
+Last updated: May 21, 2025
+Why it fits Vanilla+: Small, recent, high-rated pack adding more fitment options across many stock wheels.
+
+8. whatawhat's Livery Pack
+Category: Liveries & Wraps
+URL: https://beamng.com/resources/whatawhats-livery-pack.33516/
+File size: 36.4 MB
+Star rating: 5/5, 9 ratings
+Last updated: Feb 26, 2025
+Why it fits Vanilla+: Modern lore-friendly livery pack with strong reviews; good for roleplay and fleet variety.
+
+9. The Crew Emergency Livery Pack
+Category: Liveries & Wraps / Extra Cars - Misc
+URL: https://www.beamng.com/resources/the-crew-emergency-livery-pack.17122/
+File size: 17.9 MB
+Star rating: 4.92308/5, 13 ratings
+Last updated: Oct 25, 2024
+Why it fits Vanilla+: High-rated emergency/police liveries and traffic-friendly configs. Good for police interceptor roleplay.
+
+10. American Road
+Category: Street Racing / Maps - Urban / Maps - Countryside / Maps - Track / Maps - Misc
+URL: https://www.beamng.com/resources/american-road.3100/
+File size: 663.4 MB
+Star rating: 4.64856/5, 313 ratings
+Last updated: Apr 25, 2025
+Why it fits Vanilla+: Massive all-round map with highways, country roads, and varied driving. Big but very popular and updated.
+
+11. River Highway
+Category: Street Racing / Maps - Urban / Maps - Countryside / Maps - Misc
+URL: https://www.beamng.com/resources/river-highway.18662/
+File size: 384.2 MB
+Star rating: 4.7561/5, 123 ratings
+Last updated: Oct 30, 2024
+Why it fits Vanilla+: Huge 8x8 km map with over 200 km / 125 miles of roads. Strong highway/country driving candidate.
+
+12. NitroMethane Dragster
+Category: Drag Racing / Extra Cars - American Muscle
+URL: https://www.beamng.com/resources/nitromethane-dragster.35613/
+File size: 72.6 MB
+Star rating: 0/5, 0 ratings
+Last updated: Aug 25, 2025
+Why it fits Vanilla+: Recent dedicated dragster with launch-control style use. Low rating count, but category fit is strong.
+
+13. 69k RPM Rev Limiter
+Category: Drag Racing / Tuner & Performance Parts
+URL: https://www.beamng.com/resources/69k-rpm-rev-limiter.32199/
+File size: 7.8 KB
+Star rating: 4.57143/5, 7 ratings
+Last updated: Oct 1, 2024
+Why it fits Vanilla+: Tiny performance/tuning mod; reviews mention drag racing usefulness. Low size makes it easy to test.
+
+14. Series Turbo Diesel Engine Pack
+Category: Tuner & Performance Parts / Extra Cars - Misc
+URL: https://beamng.com/resources/series-turbo-diesel-engine-pack.30224/
+File size: Not shown in search result
+Star rating: 4.90909/5, 11 ratings
+Last updated: May 13, 2024
+Why it fits Vanilla+: Adds engine variety and turbo diesel options. Good for performance builds and truck/utility setups.
+
+15. RB26DETT 2.6L I6 Nissan Engine And Transmission
+Category: Tuner & Performance Parts / Extra Cars - JDM
+URL: https://www.beamng.com/resources/rb26dett-2-6l-i6-nissan-engine-and-transmission.27392/
+File size: 10.8 MB
+Star rating: 4.45455/5, 11 ratings
+Last updated: Jul 26, 2023
+Why it fits Vanilla+: Iconic JDM twin-turbo engine/transmission swap. Strong fit for tuner, street, drift, and skyline-style builds.
+
+16. American Racing SUV Wheel Pack
+Category: Wheels & Tyres / Extra Cars - American Muscle / Extra Cars - Misc
+URL: https://www.beamng.com/resources/american-racing-suv-wheel-pack.28158/
+File size: 38 MB
+Star rating: 5/5, 5 ratings
+Last updated: Aug 31, 2023
+Why it fits Vanilla+: American/off-road wheel set for SUV/truck builds. Great for lifted pickups and utility style.
+
+17. ETK T20 Wheel Pack
+Category: Wheels & Tyres / Stance & Fitment / Extra Cars - European
+URL: https://www.beamng.com/resources/etk-t20-wheel-pack.26154/
+File size: 77.4 MB
+Star rating: 5/5, 9 ratings
+Last updated: Apr 5, 2023
+Why it fits Vanilla+: Clean wheel options for euro/tuner/stance builds. Requires D-Troxx Wheel Pack.
+
+18. NFS BMW M3-GTR
+Category: Extra Cars - European / Circuit Racing / Street Racing / Liveries & Wraps
+URL: https://www.beamng.com/resources/nfs-bmw-m3-gtr.28434/
+File size: 110 MB
+Star rating: 4.25/5, 4 ratings
+Last updated: Dec 18, 2023
+Why it fits Vanilla+: Popular street/circuit hero car style with sequential transmission. Good for meet appeal, though not recently updated.
+
+19. Drift Shack
+Category: Drift / Maps - Track / Maps - Misc
+URL: https://www.beamng.com/resources/drift-shack.28804/
+File size: 262.4 MB
+Star rating: 4.5/5, 2 ratings
+Last updated: Nov 2, 2023
+Why it fits Vanilla+: Compact drift circuit; good for tandem sessions and drift practice.
+
+20. Driftoooo
+Category: Drift / Maps - Countryside / Maps - Track
+URL: https://www.beamng.com/resources/driftoooo.30608/
+File size: 355.6 MB
+Star rating: 10 reviews shown, rating not captured in search result
+Last updated: Page shows 3 updates; exact last update not captured in search result
+Why it fits Vanilla+: Purpose-built drift map with multiple drift zones, hills, tunnels, town area, and open practice layout.
+
+============================================================
+MEDIUM PRIORITY / CHECK BEFORE INSTALL
+============================================================
+
+21. Machine's Wheel Pack
+Category: Wheels & Tyres / Stance & Fitment
+URL: https://www.beamng.com/resources/machines-wheel-pack.1931/
+File size: 116.8 MB
+Star rating: 4.77419/5, 31 ratings
+Last updated: Feb 21, 2022
+Why it fits Vanilla+: Popular wheel pack with lore-friendly wheel replicas and tyres. Slightly old but high quality and popular.
+
+22. D-Troxx Wheel Pack
+Category: Wheels & Tyres / Stance & Fitment
+URL: https://www.beamng.com/resources/d-troxx-wheel-pack.185/
+File size: 251 MB
+Star rating: 4.92105/5, 114 ratings
+Last updated: Jan 24, 2022
+Why it fits Vanilla+: Classic wheel/tyre pack with drift and stretched tyres; also required by ETK T20 Wheel Pack. Large but widely used.
+
+23. Weird Wheel Pack
+Category: Wheels & Tyres / Drag Racing / Extra Cars - Misc
+URL: https://www.beamng.com/resources/weird-wheel-pack.12789/
+File size: 7.4 MB
+Star rating: 4.25/5, 32 ratings
+Last updated: Jun 19, 2020
+Why it fits Vanilla+: Includes odd wheels, drag wheels, grip options, donk/off-road options. Older than target window, test first.
+
+24. 1320 Donk Wheel Pack
+Category: Wheels & Tyres / Drag Racing / Extra Cars - American Muscle
+URL: https://www.beamng.com/resources/1320-donk-wheel-pack.21166/
+File size: 50.3 MB
+Star rating: 3/5, 2 ratings
+Last updated: Jan 11, 2022
+Why it fits Vanilla+: Includes drag radial and slick tyre options. Low rating and older, but directly relevant to drag/donk builds.
+
+25. Underglow Everything
+Category: Lights & Exterior Accessories / Stance & Fitment / Street Racing
+URL: https://www.beamng.com/resources/underglow-everything.26510/
+File size: Not shown in search result
+Star rating: 4.18182/5, 11 ratings
+Last updated: Nov 27, 2023
+Why it fits Vanilla+: Adds underglow to vanilla cars. Great street/tuner visual mod, but some reviews report activation issues.
+
+26. Underglow Extra Colors
+Category: Lights & Exterior Accessories / Body Kits & Visuals
+URL: https://www.beamng.com/resources/underglow-extra-colors.23933/
+File size: 4.1 MB
+Star rating: 5/5, 4 ratings
+Last updated: Sep 22, 2022
+Why it fits Vanilla+: Extra neon colours and customizable neon. Older but small and high-rated.
+
+27. D-Series Underglow
+Category: Lights & Exterior Accessories / Extra Cars - Misc
+URL: https://www.beamng.com/resources/d-series-underglow.23806/
+File size: 4.6 MB
+Star rating: 4.8/5, 5 ratings
+Last updated: Sep 22, 2022
+Why it fits Vanilla+: Good truck exterior accessory; more specific than universal underglow.
+
+28. New Racing Seats & Off-Road Seats
+Category: Interior Mods / Drift / Circuit Racing / Extra Cars - Misc
+URL: https://www.beamng.com/resources/new-racing-seats-off-road-seats.21771/
+File size: 7.7 MB
+Star rating: 5/5, 6 ratings
+Last updated: Feb 28, 2022
+Why it fits Vanilla+: Adds racing/off-road seat options. Useful for builds, but marked unsupported and older than target.
+
+29. Bacon's Drift 200BX
+Category: Drift / Tuner & Performance Parts / Body Kits & Visuals
+URL: https://www.beamng.com/resources/bacons-drift-200bx.24559/
+File size: 6.6 MB
+Star rating: 4.16667/5, 18 ratings
+Last updated: May 15, 2023
+Why it fits Vanilla+: Drift steering angle, suspension adjustment, tube chassis, and drift-focused 200BX parts. Useful but older.
+
+30. Toyota Truck Engines
+Category: Tuner & Performance Parts / Extra Cars - Misc / Drag Racing
+URL: https://www.beamng.com/resources/toyota-truck-engines.15410/
+File size: 5.9 MB
+Star rating: 4.81538/5, 65 ratings
+Last updated: Dec 29, 2021
+Why it fits Vanilla+: Great engine/transmission variety including drag transmission with transbrake. Older than target but popular.
+
+31. Hurtz Rent-A-Car Skin Pack
+Category: Liveries & Wraps / Extra Cars - Misc
+URL: https://www.beamng.com/resources/hurtz-rent-a-car-skin-pack.31442/
+File size: 8 MB
+Star rating: 4.66667/5, 3 ratings
+Last updated: Jul 10, 2024
+Why it fits Vanilla+: Fun fleet/rental skins for meet/roleplay use. Small enough to test.
+
+32. U-Haul Livery Pack
+Category: Liveries & Wraps / Extra Cars - Misc
+URL: https://www.beamng.com/resources/u-haul-livery-pack.17801/
+File size: 12.9 MB
+Star rating: 4.81818/5, 11 ratings
+Last updated: May 16, 2022
+Why it fits Vanilla+: Popular box van/truck livery pack; fun for fleet/tuner van builds. Older than target.
+
+33. Fiction Police Livery Pack
+Category: Liveries & Wraps / Lights & Exterior Accessories / Extra Cars - Misc
+URL: https://www.beamng.com/resources/fiction-police-livery-pack-%E8%99%9A%E6%8B%9F%E8%AD%A6%E8%BD%A6%E6%B6%82%E8%A3%85%E5%8C%85.3114/
+File size: 81.1 MB
+Star rating: 4.80405/5, 148 ratings
+Last updated: Aug 4, 2021
+Why it fits Vanilla+: Large high-rated police/skin pack. Useful for patrol roleplay but old.
+
+34. Drag Car 7.5 Seconds Drag
+Category: Drag Racing / Extra Cars - American Muscle
+URL: https://www.beamng.com/resources/drag-car-7-5-seconds-drag.26017/
+File size: 59.5 MB
+Star rating: 5/5, 1 rating
+Last updated: Mar 21, 2023
+Why it fits Vanilla+: Dedicated Automation drag car for West Coast USA drag strip. Low rating count and older.
+
+35. Drag Batmobile
+Category: Drag Racing / Extra Cars - Supercars / Extra Cars - Misc
+URL: https://www.beamng.com/resources/drag-batmobile.33922/
+File size: 42.8 MB
+Star rating: Not captured in search result
+Last updated: Mar 14, 2025
+Why it fits Vanilla+: Funny drag-focused 4000hp build. More novelty than core content.
+
+36. Porsche 917 LH
+Category: Circuit Racing / Extra Cars - Supercars
+URL: https://www.beamng.com/resources/porsche-917-lh.34133/
+File size: 53.2 MB
+Star rating: 0/5, 0 ratings
+Last updated: Mar 31, 2025
+Why it fits Vanilla+: Le Mans-style race car. Recent but no ratings; test before broad install.
+
+37. Ax BMW E30
+Category: Extra Cars - European / Drift / Rally
+URL: https://www.beamng.com/resources/ax-bmw-e30.33896/
+File size: 71.7 MB
+Star rating: 0/5, 0 ratings
+Last updated: Mar 10, 2025
+Why it fits Vanilla+: E30-style gravel/lightweight builds. Recent but unrated.
+
+38. the van & the furious toyota supre
+Category: Extra Cars - JDM / Extra Cars - Misc / Street Racing
+URL: https://www.beamng.com/resources/the-van-the-furious-toyota-supre.36276/
+File size: 79.1 MB
+Star rating: 0/5, 0 ratings
+Last updated: Oct 31, 2025
+Why it fits Vanilla+: Novelty fast van/Supra-style build; could fit a fun Vanilla+ tuner server, but low confidence.
+
+============================================================
+CAUTION / SKIP UNLESS MANUALLY TESTED
+============================================================
+
+39. City of Los Injurus
+Category: Maps - Urban / Street Racing / Maps - Misc
+URL: https://www.beamng.com/resources/city-of-los-injurus.10021/
+File size: 3.5 GB
+Star rating: 173 reviews shown; exact all-time rating not captured in search result
+Last updated: Dec 20/22, 2023
+Why it fits Vanilla+: Massive city map and excellent urban/street environment.
+Install priority: SKIP for now. It alone exceeds the 3GB server cap.
+
+40. Drag Strip
+Category: Drag Racing / Maps - Track
+URL: https://www.beamng.com/resources/drag-strip.2205/
+File size: 168.1 MB
+Star rating: 4.43333/5, 30 ratings
+Last updated: May 5, 2017
+Why it fits Vanilla+: Dedicated 1/4 mile drag strip.
+Install priority: SKIP/CAUTION. Old and recent reviews mention broken/missing textures.
+
+41. West Coast USA Extended Drag Strip
+Category: Drag Racing / Maps - Track
+URL: https://www.beamng.com/resources/west-coast-usa-extended-drag-strip.17395/
+File size: 140.6 MB
+Star rating: 5/5, 2 ratings
+Last updated: May 20, 2021
+Why it fits Vanilla+: Extended WCUSA drag strip.
+Install priority: CAUTION. Marked outdated and over 2 years old.
+
+42. Better Drag Transmissions
+Category: Drag Racing / Tuner & Performance Parts
+URL: https://beamng.com/resources/better-drag-transmissions.3291/
+File size: 525.6 KB
+Star rating: Version rating 5/5, 4 ratings
+Last updated: Jan 29, 2018
+Why it fits Vanilla+: Drag transmissions and transbrake-style tuning.
+Install priority: SKIP. Marked unsupported and far older than 2 years.
+
+43. Drift Pack
+Category: Drift / Tuner & Performance Parts
+URL: https://www.beamng.com/resources/drift-pack.478/
+File size: 2.9 MB
+Star rating: 11 reviews shown; exact all-time rating not captured in search result
+Last updated: Jun 17, 2016
+Why it fits Vanilla+: Drift configs for many vehicles.
+Install priority: SKIP. Unsupported and very old.
+
+44. Roundabout Drift Map
+Category: Drift / Maps - Track
+URL: https://beamng.com/resources/roundabout-drift-map.6685/
+File size: Not captured in search result
+Star rating: 14 reviews shown; exact all-time rating not captured in search result
+Last updated: Not captured in search result
+Why it fits Vanilla+: East Coast USA with roundabouts and drift tracks.
+Install priority: SKIP/CAUTION. Page text mentions missing textures.
+
+45. Endless Highway
+Category: Street Racing / Maps - Misc
+URL: https://www.beamng.com/resources/endless-highway.1427/
+File size: 26.1 MB
+Star rating: 4.67647/5, 68 ratings
+Last updated: Sep 25, 2016
+Why it fits Vanilla+: Long road for speed testing.
+Install priority: SKIP unless nostalgia/testing; too old for your update rule.
+
+46. So-Cal Interstate Highway
+Category: Street Racing / Maps - Urban / Maps - Countryside
+URL: https://www.beamng.com/resources/so-cal-interstate-highway-126-miles-of-road-path.891/
+File size: Not captured in search result
+Star rating: 4.61111/5, 54 ratings
+Last updated: Jan 4, 2017
+Why it fits Vanilla+: Long highway map.
+Install priority: SKIP. Resource says deprecated and conflicts with Los Injurus.
+
+============================================================
+ADDITIONAL OFFICIAL RESOURCE FINDS
+============================================================
+
+These were found while cross-checking the official BeamNG resources index. They are useful category matches, but several are older or need extra testing before adding to a public BeamMP server.
+
+47. Meo's Drag Parts Pack
+Category: Drag Racing / Tuner & Performance Parts / Wheels & Tyres / Body Kits & Visuals
+URL: https://www.beamng.com/resources/meos-drag-parts-pack.10968/
+File size: Not captured in search result
+Star rating: 4.625/5, 120 ratings
+Last updated: May 26, 2026
+Why it fits Vanilla+: Strong official-resource match for drag slicks, drag wings, parachute bags, high-power nitrous, suspension, radiator, and drag-oriented parts. This is one of the best drag-part candidates to manually check first.
+
+48. CK Tire Pack
+Category: Wheels & Tyres / Tuner & Performance Parts / Drift / Circuit Racing
+URL: https://www.beamng.com/resources/ck-tire-pack.34796/
+File size: Not captured in search result
+Star rating: 4.8/5, 35 ratings
+Last updated: May 26, 2026
+Why it fits Vanilla+: Recent, highly rated tyre pack. Good candidate for more grip/fitment options across street, drift, drag, and circuit builds.
+
+49. The Curiosity Dragavan
+Category: Drag Racing / Extra Cars - Misc / Lights & Exterior Accessories
+URL: https://www.beamng.com/resources/the-curiosity-dragavan.33662/
+File size: 32.3 MB
+Star rating: 7 reviews shown; exact aggregate rating not captured in search result
+Last updated: New Mud/Sand Dragster update shown; exact date not captured in search result
+Why it fits Vanilla+: H-Series drag wheelie show van with big-block style engine, exhaust flame system, drag tyres, paddle tyres, and wheelie bars. Fun car-meet and drag content.
+
+50. OMURO BY ONEH1T
+Category: Drift / Street Racing / Maps - Track / Maps - Misc
+URL: https://www.beamng.com/resources/omuro-by-oneh1t.34525/
+File size: Not captured in search result
+Star rating: Search result notes positive review text but no aggregate captured
+Last updated: Published about 1.1 years ago
+Why it fits Vanilla+: Japanese-inspired drift track with sweepers, mangi zones, and tight hairpins. Good for drift/tandem nights if the page confirms current compatibility.
+
+51. The DRAG TRUCK
+Category: Drag Racing / Extra Cars - American Muscle / Extra Cars - Misc
+URL: https://www.beamng.com/resources/the-drag-truck.10840/
+File size: 27.9 MB
+Star rating: 4.66667/5, 3 ratings
+Last updated: Jan 6, 2020
+Why it fits Vanilla+: Dedicated drag truck with twin-turbo V10 and 400 m drag testing. Install priority is LOW/SKIP for now because it is over two years old, but it is a useful reference for the drag category.
+
+52. Burnside Experimental Drag
+Category: Drag Racing / Tuner & Performance Parts / Extra Cars - American Muscle
+URL: https://www.beamng.com/resources/burnside-experimental-drag.25569/
+File size: 34 MB
+Star rating: 2 reviews shown; exact aggregate rating not captured in search result
+Last updated: Published about 3.3 years ago
+Why it fits Vanilla+: Adds a high-power Burnside drag setup with experimental V8, supercharger stages, drag transmission, and drag radiator. Install priority is LOW/SKIP unless manually tested because it is older than the requested freshness window.
+
+============================================================
+CATEGORY COVERAGE SUMMARY
+============================================================
+
+Drag Racing:
+- NitroMethane Dragster
+- 100KM Straight
+- 69k RPM Rev Limiter
+- Weird Wheel Pack
+- 1320 Donk Wheel Pack
+- Drag Car 7.5 Seconds Drag
+- Drag Batmobile
+- Drag Strip (skip/caution)
+- West Coast USA Extended Drag Strip (caution)
+
+Street Racing:
+- Band1t Highway
+- American Road
+- River Highway
+- 100KM Straight
+- NFS BMW M3-GTR
+- Underglow Everything
+
+Drift:
+- Drift Shack
+- Driftoooo
+- Bacon's Drift 200BX
+- Ax BMW E30
+- Drift Pack (skip)
+
+Circuit Racing:
+- 2018 Porsche 919 Hybrid EVO
+- Porsche 917 LH
+- NFS BMW M3-GTR
+- American Road
+
+Tuner / Performance Parts:
+- RB26DETT 2.6L I6 Nissan Engine And Transmission
+- Series Turbo Diesel Engine Pack
+- Toyota Truck Engines
+- 69k RPM Rev Limiter
+- Bacon's Drift 200BX
+
+Body Kits & Visuals:
+- Vintage Custom Parts & Livery Pack
+- Underglow Everything
+- Underglow Extra Colors
+- Bacon's Drift 200BX
+
+Wheels & Tyres:
+- D-Troxx Wheel Pack
+- Machine's Wheel Pack
+- Truck Wheel Mod
+- Resized Wheel Pack
+- ETK T20 Wheel Pack
+- American Racing SUV Wheel Pack
+- Weird Wheel Pack
+- 1320 Donk Wheel Pack
+
+Stance & Fitment:
+- Resized Wheel Pack
+- D-Troxx Wheel Pack
+- Machine's Wheel Pack
+- ETK T20 Wheel Pack
+- Underglow Everything
+
+Liveries & Wraps:
+- whatawhat's Livery Pack
+- The Crew Emergency Livery Pack
+- Vintage Custom Parts & Livery Pack
+- Hurtz Rent-A-Car Skin Pack
+- U-Haul Livery Pack
+- Fiction Police Livery Pack
+
+Lights & Exterior Accessories:
+- Underglow Everything
+- Underglow Extra Colors
+- D-Series Underglow
+- The Crew Emergency Livery Pack
+
+Interior Mods:
+- New Racing Seats & Off-Road Seats
+- Vintage Custom Parts & Livery Pack
+
+Extra Cars - JDM:
+- RB26DETT 2.6L I6 Nissan Engine And Transmission
+- the van & the furious toyota supre
+
+Extra Cars - European:
+- 2018 Porsche 919 Hybrid EVO
+- NFS BMW M3-GTR
+- Porsche 917 LH
+- Ax BMW E30
+- ETK T20 Wheel Pack
+
+Extra Cars - American Muscle:
+- NitroMethane Dragster
+- Drag Car 7.5 Seconds Drag
+- The DRAG TRUCK
+- 1320 Donk Wheel Pack
+
+Extra Cars - Supercars:
+- 2018 Porsche 919 Hybrid EVO
+- Porsche 917 LH
+- Drag Batmobile
+
+Extra Cars - Misc:
+- REKT Barren Dunes Wasteland Highway
+- Toyota Truck Engines
+- Truck Wheel Mod
+- Hurtz Rent-A-Car Skin Pack
+- U-Haul Livery Pack
+
+Maps - Urban:
+- Band1t Highway
+- American Road
+- River Highway
+- City of Los Injurus (skip due size)
+
+Maps - Countryside:
+- American Road
+- River Highway
+- REKT Barren Dunes Wasteland Highway
+- Driftoooo
+
+Maps - Track:
+- Drift Shack
+- Drag Strip (skip/caution)
+- 100KM Straight
+- American Road
+
+Maps - Misc:
+- Band1t Highway
+- 100KM Straight
+- REKT Barren Dunes Wasteland Highway
+- American Road
+- River Highway
+
+============================================================
+SUGGESTED FIRST INSTALL BATCH UNDER 3GB
+============================================================
+
+Recommended compact/high-value batch:
+- Band1t Highway (190 MB)
+- 100KM Straight (5.7 MB)
+- REKT Barren Dunes Wasteland Highway (357 MB)
+- River Highway (384.2 MB)
+- American Road (663.4 MB)
+- Drift Shack (262.4 MB)
+- 2018 Porsche 919 Hybrid EVO (54.2 MB)
+- NitroMethane Dragster (72.6 MB)
+- RB26DETT Engine/Transmission (10.8 MB)
+- Resized Wheel Pack (2.8 MB)
+- Truck Wheel Mod (unknown size)
+- whatawhat's Livery Pack (36.4 MB)
+- The Crew Emergency Livery Pack (17.9 MB)
+- Underglow Extra Colors (4.1 MB)
+- 69k RPM Rev Limiter (7.8 KB)
+
+Known-size total excluding Truck Wheel Mod: about 2.05 GB.
+This leaves room for a few more small/medium mods while staying under 3GB.
