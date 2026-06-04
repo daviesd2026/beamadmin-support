@@ -114,6 +114,7 @@ const pageLabels = {
   players:   'Players',
   vehicles:  'Vehicles',
   maps:      'Maps',
+  mods:      'Mods',
   banlist:   'Ban list',
   settings:  'Settings',
   console:   'Console',
@@ -601,6 +602,7 @@ function showManagedPage(name) {
   const renderers = {
     vehicles: renderVehiclesPage,
     maps: renderMapsPage,
+    mods: renderModsPage,
     banlist: renderBanListPage,
     settings: renderSettingsPage,
     console: renderConsolePage,
@@ -744,6 +746,58 @@ async function renderBanListPage() {
     });
   } catch (err) {
     renderError(err.message, renderBanListPage);
+  }
+}
+
+function formatBytes(bytes) {
+  const value = Number(bytes || 0);
+  if (value >= 1024 * 1024 * 1024) return (value / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  if (value >= 1024 * 1024) return (value / (1024 * 1024)).toFixed(2) + ' MB';
+  if (value >= 1024) return (value / 1024).toFixed(1) + ' KB';
+  return value + ' B';
+}
+
+async function renderModsPage() {
+  renderLoading('Loading mods');
+  try {
+    const payload = await apiRequest('/api/mods');
+    const mods = payload.mods || [];
+    pageOther.innerHTML = [
+      '<div class="section">',
+        '<div class="section-header"><span class="section-title">Vanilla+ mods</span><button class="act-btn" id="refresh-mods"><i class="ti ti-refresh"></i> Refresh</button></div>',
+        '<div class="mod-drop-info">',
+          '<div><strong>Drop folder</strong><code>' + htmlEscape(payload.sourceDir) + '</code></div>',
+          '<div><strong>Install target</strong><code>' + htmlEscape(payload.targetDir) + '</code></div>',
+          '<p>Add `.zip` files to the drop folder, refresh this page, tick the mods to install, then apply them to ' + htmlEscape(payload.targetServerName) + '.</p>',
+        '</div>',
+        '<div class="card"><table class="player-table"><thead><tr><th style="width:46px"></th><th>Mod zip</th><th>Size</th><th>Status</th><th>Target</th></tr></thead><tbody>',
+        mods.length ? mods.map(function (mod) {
+          return '<tr><td><input class="mod-check" type="checkbox" value="' + htmlEscape(mod.name) + '"' + (mod.installed ? ' checked' : '') + '></td><td>' + htmlEscape(mod.name) + '</td><td>' + htmlEscape(formatBytes(mod.size)) + '</td><td><span class="badge ' + (mod.installed ? 'badge-green' : 'badge-gray') + '">' + (mod.installed ? 'installed' : 'available') + '</span></td><td>' + htmlEscape(mod.targetPath) + '</td></tr>';
+        }).join('') : '<tr><td colspan="5">No `.zip` mods found in the drop folder yet.</td></tr>',
+        '</tbody></table></div>',
+        '<div class="mod-actions"><button class="act-btn" id="apply-mods"><i class="ti ti-package-import"></i> Apply selected to Vanilla+</button><span id="mod-result"></span></div>',
+      '</div>'
+    ].join('');
+
+    document.getElementById('refresh-mods').addEventListener('click', renderModsPage);
+    document.getElementById('apply-mods').addEventListener('click', async function () {
+      const selected = Array.from(document.querySelectorAll('.mod-check:checked')).map(function (input) { return input.value; });
+      const result = document.getElementById('mod-result');
+      if (!selected.length) {
+        result.textContent = 'Select at least one mod zip.';
+        return;
+      }
+      result.textContent = 'Copying...';
+      try {
+        const response = await apiRequest('/api/mods/apply', { method: 'POST', body: JSON.stringify({ mods: selected }) });
+        result.textContent = 'Copied ' + (response.copied || []).length + ' mod(s) to Vanilla+. Restart Vanilla+ if players need a clean reload.';
+        setTimeout(renderModsPage, 1200);
+      } catch (err) {
+        result.textContent = err.message;
+      }
+    });
+  } catch (err) {
+    renderError(err.message, renderModsPage);
   }
 }
 

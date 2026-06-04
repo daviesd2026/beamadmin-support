@@ -930,6 +930,52 @@ html, body {
   white-space: nowrap;
 }
 
+.mod-drop-info {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.mod-drop-info div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.mod-drop-info strong {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.mod-drop-info code {
+  font-family: var(--mono);
+  color: var(--accent);
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 4px 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mod-drop-info p,
+.mod-actions span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.mod-actions {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 /* ---- Placeholder page ---- */
 .placeholder-page {
   display: flex;

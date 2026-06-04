@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import shutil
 import subprocess
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -50,6 +51,8 @@ MAP_PATHS = {
     "Industrial Site": "/levels/industrial/info.json",
     "East Coast USA": "/levels/east_coast_usa/info.json",
 }
+MOD_SOURCE_DIR = Path("/opt/beamadmin/mods")
+MOD_TARGET_SERVER_ID = "vanilla-plus"
 
 
 def bridge_dir(server):
@@ -219,6 +222,70 @@ def bans_for_server(server):
     return rows
 
 
+def mod_target_server():
+    server = server_by_id(MOD_TARGET_SERVER_ID)
+    if not server:
+        raise RuntimeError("mod target server is not configured")
+    return server
+
+
+def mod_target_dir():
+    return Path(mod_target_server()["path"]) / "Resources" / "Client"
+
+
+def safe_mod_name(value):
+    name = Path(str(value or "")).name
+    if not name.lower().endswith(".zip") or name in ("", ".", ".."):
+        return ""
+    return name
+
+
+def list_mods():
+    MOD_SOURCE_DIR.mkdir(parents=True, exist_ok=True)
+    target = mod_target_dir()
+    target.mkdir(parents=True, exist_ok=True)
+    mods = []
+    for path in sorted(MOD_SOURCE_DIR.glob("*.zip"), key=lambda p: p.name.lower()):
+        installed_path = target / path.name
+        stat = path.stat()
+        mods.append({
+            "name": path.name,
+            "size": stat.st_size,
+            "modified": int(stat.st_mtime),
+            "installed": installed_path.exists(),
+            "targetPath": str(installed_path),
+        })
+    return {
+        "sourceDir": str(MOD_SOURCE_DIR),
+        "targetServerId": MOD_TARGET_SERVER_ID,
+        "targetServerName": mod_target_server()["name"],
+        "targetDir": str(target),
+        "mods": mods,
+    }
+
+
+def apply_mods(names):
+    MOD_SOURCE_DIR.mkdir(parents=True, exist_ok=True)
+    target = mod_target_dir()
+    target.mkdir(parents=True, exist_ok=True)
+    copied = []
+    skipped = []
+    for raw_name in names or []:
+        name = safe_mod_name(raw_name)
+        if not name:
+            skipped.append({"name": str(raw_name), "reason": "invalid zip name"})
+            continue
+        src = MOD_SOURCE_DIR / name
+        if not src.exists():
+            skipped.append({"name": name, "reason": "source file not found"})
+            continue
+        dst = target / name
+        shutil.copy2(src, dst)
+        os.chmod(dst, 0o664)
+        copied.append({"name": name, "path": str(dst)})
+    return {"copied": copied, "skipped": skipped, "state": list_mods()}
+
+
 def safe_text(value, fallback):
     text = str(value or "").replace("\r", " ").replace("\n", " ").strip()
     return text[:180] if text else fallback
@@ -359,6 +426,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(200, {"ok": True})
             return
 
+        if path == "/api/mods/apply":
+            try:
+                result = apply_mods(body.get("mods", []))
+                self.send_json(200, {"ok": True, **result})
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
+            return
+
         self.send_json(404, {"error": "not found"})
 
     def do_GET(self):
@@ -381,6 +456,13 @@ class Handler(BaseHTTPRequestHandler):
                 item["online"] = bool(item["bridge"].get("seenAt") and time.time() - int(item["bridge"].get("seenAt", 0)) < 20)
                 payload.append(item)
             self.send_json(200, {"publicIp": PUBLIC_IP, "servers": payload})
+            return
+
+        if path == "/api/mods":
+            try:
+                self.send_json(200, list_mods())
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
             return
 
         parts = path.strip("/").split("/")
