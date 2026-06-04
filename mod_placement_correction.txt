@@ -1,0 +1,12 @@
+# Vanilla+ mod placement correction
+
+The downloaded BeamNG mod batch was moved out of the live Vanilla+ Client folder and into the BeamAdmin staging folder.
+
+Correct staging folder:
+/opt/beamadmin/mods
+
+Moved/deduped files from the download report: 42
+Remaining zips in /opt/beammp-vanilla-plus/Resources/Client: 8
+Zips in /opt/beamadmin/mods: 42
+
+Vanilla+ was restarted after the move so the server stops serving the newly downloaded staging batch directly.
