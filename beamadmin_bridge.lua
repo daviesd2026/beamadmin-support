@@ -6,6 +6,8 @@ local BANS_FILE = BASE_DIR .. "/bans.json"
 local RESULTS_FILE = BASE_DIR .. "/results.log"
 local TICK_EVENT = "beamadmin.bridge.tick"
 
+local startLights = {}
+
 local bans = {
     names = {},
     ips = {},
@@ -56,6 +58,15 @@ local function writeJson(path, payload)
     handle:write(Util.JsonEncode(payload))
     handle:close()
     return true
+end
+
+local function sendServerMessage(message)
+    if MP.SendChatMessage then
+        pcall(function() MP.SendChatMessage(-1, message) end)
+    end
+    if MP.SendNotification then
+        pcall(function() MP.SendNotification(-1, message, "flag", "BeamAdmin") end)
+    end
 end
 
 local function appendResult(commandId, ok, message)
@@ -181,6 +192,19 @@ local function executeCommand(command)
     local reason = trim(command.reason)
     if reason == "" then reason = "Admin action from BeamAdmin" end
 
+    if action == "startlights" then
+        local seconds = tonumber(command.seconds) or 5
+        if seconds < 1 then seconds = 1 end
+        if seconds > 10 then seconds = 10 end
+        startLights = {
+            active = true,
+            remaining = math.floor(seconds),
+            nextAt = now(),
+        }
+        sendServerMessage("START LIGHTS: get ready")
+        return true, "started " .. tostring(seconds) .. " second light countdown"
+    end
+
     if action == "unban" then
         local name = lower(command.playerName)
         if name ~= "" then bans.names[name] = nil end
@@ -265,6 +289,23 @@ local function executeCommand(command)
     return false, "unknown action"
 end
 
+local function processStartLights()
+    if not startLights.active then return end
+    local current = now()
+    if current < tonumber(startLights.nextAt or 0) then return end
+
+    local remaining = tonumber(startLights.remaining or 0)
+    if remaining > 0 then
+        sendServerMessage("START LIGHTS: [RED] " .. tostring(remaining))
+        startLights.remaining = remaining - 1
+        startLights.nextAt = current + 1
+        return
+    end
+
+    sendServerMessage("START LIGHTS: [GREEN] GO!")
+    startLights = {}
+end
+
 local function processQueue()
     local queue = readJson(QUEUE_FILE, {})
     if type(queue) ~= "table" or #queue == 0 then return end
@@ -291,7 +332,7 @@ function onInit()
     MP.RegisterEvent(TICK_EVENT, "onBeamAdminBridgeTick")
     MP.RegisterEvent("onPlayerAuth", "onPlayerAuth")
     pcall(function() MP.CancelEventTimer(TICK_EVENT) end)
-    MP.CreateEventTimer(TICK_EVENT, 2000)
+    MP.CreateEventTimer(TICK_EVENT, 500)
     log("loaded")
 end
 
@@ -302,6 +343,7 @@ end
 
 function onBeamAdminBridgeTick()
     processQueue()
+    processStartLights()
     writeStatus()
 end
 

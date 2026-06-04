@@ -500,6 +500,7 @@ function renderLiveDashboard(servers) {
         '<div class="server-actions">',
           '<button class="act-btn copy-address" data-address="' + htmlEscape(server.address) + '"><i class="ti ti-copy"></i> Copy address</button>',
           '<button class="act-btn copy-path" data-address="' + htmlEscape(server.path) + '"><i class="ti ti-folder"></i> Copy path</button>',
+          '<button class="act-btn start-lights" data-server="' + htmlEscape(server.id) + '" data-name="' + htmlEscape(server.name) + '"><i class="ti ti-traffic-lights"></i> Start lights</button>',
           '<button class="act-btn danger restart-server" data-server="' + htmlEscape(server.id) + '" data-name="' + htmlEscape(server.name) + '"><i class="ti ti-refresh"></i> Restart</button>',
         '</div>',
       '</article>'
@@ -530,6 +531,25 @@ function renderLiveDashboard(servers) {
 
   document.querySelectorAll('.copy-address, .copy-path').forEach(function (button) {
     button.addEventListener('click', function () { copyText(button.dataset.address, button); });
+  });
+  document.querySelectorAll('.start-lights').forEach(function (button) {
+    button.addEventListener('click', async function () {
+      const original = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<i class="ti ti-loader-2"></i> Starting';
+      try {
+        await apiRequest('/api/servers/' + button.dataset.server + '/startlights', { method: 'POST', body: JSON.stringify({}) });
+        button.innerHTML = '<i class="ti ti-check"></i> Lights queued';
+      } catch (err) {
+        alert(err.message);
+        button.innerHTML = original;
+      } finally {
+        setTimeout(function () {
+          button.disabled = false;
+          button.innerHTML = original;
+        }, 3000);
+      }
+    });
   });
   document.querySelectorAll('.restart-server').forEach(function (button) {
     button.addEventListener('click', async function () {

@@ -374,7 +374,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(202, {"ok": True, "command": command})
             return
 
-        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] in ("deletevehicle", "changemap", "console", "restart"):
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] in ("deletevehicle", "changemap", "console", "restart", "startlights"):
             server = server_by_id(parts[2])
             if not server:
                 self.send_json(404, {"error": "server not found"})
@@ -404,7 +404,10 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_json(500, {"error": str(exc)})
                     return
             else:
-                command = queue_command(server, {"action": "console", "command": safe_text(body.get("command"), "")})
+                if action == "startlights":
+                    command = queue_command(server, {"action": "startlights", "seconds": 5})
+                else:
+                    command = queue_command(server, {"action": "console", "command": safe_text(body.get("command"), "")})
             self.send_json(202, {"ok": True, "command": command})
             return
 
