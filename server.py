@@ -374,7 +374,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(202, {"ok": True, "command": command})
             return
 
-        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] in ("deletevehicle", "changemap", "console"):
+        if len(parts) == 4 and parts[0] == "api" and parts[1] == "servers" and parts[3] in ("deletevehicle", "changemap", "console", "restart"):
             server = server_by_id(parts[2])
             if not server:
                 self.send_json(404, {"error": "server not found"})
@@ -382,6 +382,14 @@ class Handler(BaseHTTPRequestHandler):
             action = parts[3]
             if action == "deletevehicle":
                 command = queue_command(server, {"action": "deletevehicle", "playerId": safe_text(body.get("playerId"), ""), "vehicleId": safe_text(body.get("vehicleId"), "")})
+            elif action == "restart":
+                try:
+                    service = restart_server_service(server)
+                    self.send_json(200, {"ok": True, "restarted": service})
+                    return
+                except Exception as exc:
+                    self.send_json(500, {"error": str(exc)})
+                    return
             elif action == "changemap":
                 map_name = safe_text(body.get("map"), "")
                 if map_name not in MAP_PATHS:
