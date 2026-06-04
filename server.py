@@ -5,6 +5,7 @@ import os
 import re
 import secrets
 import shutil
+import socket
 import subprocess
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -210,10 +211,18 @@ def systemctl_active(service):
         return "unknown"
 
 
-def systemctl_restart_args(service):
+def systemctl_args(action, service):
     if hasattr(os, "geteuid") and os.geteuid() == 0:
-        return ["systemctl", "restart", service]
-    return ["sudo", "-n", "systemctl", "restart", service]
+        return ["systemctl", action, service]
+    return ["sudo", "-n", "systemctl", action, service]
+
+
+def tcp_port_open(port):
+    try:
+        with socket.create_connection(("127.0.0.1", int(port)), timeout=1):
+            return True
+    except Exception:
+        return False
 
 
 def restart_server_service(server):
@@ -221,14 +230,35 @@ def restart_server_service(server):
     if not service:
         raise RuntimeError("server service is not configured")
     before = systemctl_value(service, "ExecMainStartTimestampMonotonic")
-    result = run_command(systemctl_restart_args(service), timeout=45)
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout or "restart failed").strip()
+    stop_result = run_command(systemctl_args("stop", service), timeout=45)
+    if stop_result.returncode != 0:
+        detail = (stop_result.stderr or stop_result.stdout or "stop failed").strip()
         if "password" in detail.lower() or "sudo" in detail.lower():
-            detail += " Passwordless sudo is required for the beamadmin service user to restart BeamMP services."
+            detail += " Passwordless sudo is required for the beamadmin service user to manage BeamMP services."
         raise RuntimeError(detail)
 
-    deadline = time.time() + 20
+    port = server.get("port")
+    deadline = time.time() + 30
+    stopped = False
+    while time.time() < deadline:
+        inactive = systemctl_active(service) in ("inactive", "failed")
+        port_closed = not port or not tcp_port_open(port)
+        if inactive and port_closed:
+            stopped = True
+            break
+        time.sleep(1)
+
+    if not stopped:
+        raise RuntimeError(f"{service} did not fully stop before restart")
+
+    time.sleep(5)
+
+    start_result = run_command(systemctl_args("start", service), timeout=45)
+    if start_result.returncode != 0:
+        detail = (start_result.stderr or start_result.stdout or "start failed").strip()
+        raise RuntimeError(detail)
+
+    deadline = time.time() + 30
     last_active = "unknown"
     last_marker = ""
     while time.time() < deadline:
@@ -238,7 +268,7 @@ def restart_server_service(server):
             return {"service": service, "status": last_active, "startedAt": last_marker}
         time.sleep(1)
 
-    raise RuntimeError(f"restart command completed but {service} did not report a new active process; status={last_active}")
+    raise RuntimeError(f"{service} did not report a new active process after restart; status={last_active}")
 
 
 def tail_lines(path, limit=100):
