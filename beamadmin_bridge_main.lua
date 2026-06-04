@@ -1,0 +1,3 @@
+-- Compatibility stub.
+-- BeamAdmin's live bridge code is in beamadmin_bridge.lua.
+-- Keep this file harmless because BeamMP loads every Lua file in a plugin folder.

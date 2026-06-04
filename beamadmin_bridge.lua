@@ -69,6 +69,14 @@ local function sendServerMessage(message)
     end
 end
 
+local function sendVisualCountdown(seconds)
+    if not MP.TriggerClientEvent then return end
+    local payload = Util.JsonEncode({
+        seconds = tonumber(seconds) or 5,
+    })
+    pcall(function() MP.TriggerClientEvent(-1, "beamadmin:startlights", payload) end)
+end
+
 local function appendResult(commandId, ok, message)
     local handle = io.open(RESULTS_FILE, "a")
     if handle then
@@ -201,6 +209,7 @@ local function executeCommand(command)
             remaining = math.floor(seconds),
             nextAt = now(),
         }
+        sendVisualCountdown(seconds)
         sendServerMessage("START LIGHTS: get ready")
         return true, "started " .. tostring(seconds) .. " second light countdown"
     end
