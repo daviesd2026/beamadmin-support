@@ -342,7 +342,7 @@ renderServerDashboard();
 let apiToken = localStorage.getItem('beam_token') || sessionStorage.getItem('beamadminToken') || '';
 let refreshTimer = null;
 let pageTimer = null;
-const DISCORD_LINK = 'https://discord.gg/2WEntWFeQs';
+const DISCORD_LINK = 'https://discord.gg/52QCEH3svU';
 
 const REASON_TEMPLATES = {
   kick: [
